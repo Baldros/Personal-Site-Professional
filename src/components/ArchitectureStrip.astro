@@ -1,0 +1,13 @@
+---
+import { architecturePillars } from "../data/api-strategy";
+---
+
+<div class="architecture-strip">
+  {architecturePillars.map((pillar, index) => (
+    <article>
+      <span>{String(index + 1).padStart(2, "0")}</span>
+      <h3>{pillar.title}</h3>
+      <p>{pillar.body}</p>
+    </article>
+  ))}
+</div>

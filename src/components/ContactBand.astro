@@ -1,0 +1,26 @@
+---
+import { Github, Linkedin, Mail } from "lucide-astro";
+import { profile } from "../data/profile";
+---
+
+<section class="contact-band" id="contact" aria-labelledby="contact-title">
+  <div class="container contact-band__inner">
+    <div>
+      <p class="eyebrow">Contact</p>
+      <h2 id="contact-title">For applied AI, automation, and engineering software conversations.</h2>
+    </div>
+    <div class="contact-band__actions">
+      <a class="button button--primary" href={profile.links.email}>
+        <Mail size={18} strokeWidth={1.8} />
+        <span>Email</span>
+      </a>
+      <a class="button" href={profile.links.linkedin} target="_blank" rel="noreferrer">
+        <Linkedin size={18} strokeWidth={1.8} />
+        <span>LinkedIn</span>
+      </a>
+      <a class="button button--icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub">
+        <Github size={18} strokeWidth={1.8} />
+      </a>
+    </div>
+  </div>
+</section>

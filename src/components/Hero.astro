@@ -1,0 +1,112 @@
+---
+import { ArrowDown, FileText, Github, Linkedin } from "lucide-astro";
+import { profile } from "../data/profile";
+---
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <canvas class="hero__canvas" data-signal-canvas aria-hidden="true"></canvas>
+
+  <div class="hero__content container">
+    <p class="eyebrow">Software & AI Engineering · Rio de Janeiro</p>
+    <h1 id="hero-title">{profile.name}</h1>
+    <p class="hero__lead">{profile.headline}</p>
+
+    <div class="hero__actions" aria-label="Primary actions">
+      <a class="button button--primary" href="#projects">
+        <span>View work</span>
+        <ArrowDown size={18} strokeWidth={1.8} />
+      </a>
+      <a class="button" href={profile.links.linkedin} target="_blank" rel="noreferrer">
+        <Linkedin size={18} strokeWidth={1.8} />
+        <span>LinkedIn</span>
+      </a>
+      <a class="button button--icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub profile">
+        <Github size={18} strokeWidth={1.8} />
+      </a>
+      <a class="button button--icon" href={profile.links.lattes} target="_blank" rel="noreferrer" aria-label="Lattes CV">
+        <FileText size={18} strokeWidth={1.8} />
+      </a>
+    </div>
+
+    <div class="hero__proof" aria-label="Professional proof points">
+      {profile.proofPoints.map((point) => <span>{point}</span>)}
+    </div>
+  </div>
+</section>
+
+<script>
+  const canvas = document.querySelector("[data-signal-canvas]") as HTMLCanvasElement | null;
+
+  if (canvas) {
+    const context = canvas.getContext("2d");
+    const pointer = { x: 0.5, y: 0.5 };
+    const points = Array.from({ length: 48 }, (_, index) => ({
+      x: (index % 12) / 11,
+      y: Math.floor(index / 12) / 3,
+      phase: index * 0.37
+    }));
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(rect.width * scale);
+      canvas.height = Math.floor(rect.height * scale);
+      context?.setTransform(scale, 0, 0, scale, 0, 0);
+    };
+
+    const draw = (time: number) => {
+      if (!context) return;
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "#181611";
+      context.fillRect(0, 0, width, height);
+
+      const t = time * 0.00035;
+      const plotted = points.map((point) => {
+        const drift = Math.sin(t + point.phase) * 18;
+        const influenceX = (pointer.x - 0.5) * 18;
+        const influenceY = (pointer.y - 0.5) * 18;
+        return {
+          x: point.x * width + drift + influenceX,
+          y: point.y * height + Math.cos(t + point.phase) * 16 + influenceY
+        };
+      });
+
+      context.strokeStyle = "rgba(230, 223, 208, 0.17)";
+      context.lineWidth = 1;
+      plotted.forEach((point, index) => {
+        for (let next = index + 1; next < plotted.length; next += 1) {
+          const target = plotted[next];
+          const distance = Math.hypot(point.x - target.x, point.y - target.y);
+          if (distance < 155) {
+            context.globalAlpha = Math.max(0, 1 - distance / 155);
+            context.beginPath();
+            context.moveTo(point.x, point.y);
+            context.lineTo(target.x, target.y);
+            context.stroke();
+          }
+        }
+      });
+
+      context.globalAlpha = 1;
+      plotted.forEach((point, index) => {
+        context.fillStyle = index % 5 === 0 ? "#c8934a" : index % 3 === 0 ? "#6f8c79" : "#d8d1c3";
+        context.fillRect(point.x - 1.5, point.y - 1.5, 3, 3);
+      });
+
+      context.fillStyle = "rgba(24, 22, 17, 0.46)";
+      context.fillRect(0, 0, width, height);
+      requestAnimationFrame(draw);
+    };
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", (event) => {
+      pointer.x = event.clientX / Math.max(1, window.innerWidth);
+      pointer.y = event.clientY / Math.max(1, window.innerHeight);
+    });
+    resize();
+    requestAnimationFrame(draw);
+  }
+</script>

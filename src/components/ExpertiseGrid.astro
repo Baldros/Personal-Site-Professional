@@ -1,0 +1,15 @@
+---
+import { expertise } from "../data/profile";
+---
+
+<div class="expertise-grid">
+  {expertise.map((item) => (
+    <article class={`expertise-card expertise-card--${item.accent}`}>
+      <h3>{item.title}</h3>
+      <p>{item.body}</p>
+      <ul>
+        {item.items.map((skill) => <li>{skill}</li>)}
+      </ul>
+    </article>
+  ))}
+</div>

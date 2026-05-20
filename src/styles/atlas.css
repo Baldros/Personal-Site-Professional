@@ -1,0 +1,163 @@
+.atlas {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 40;
+  color: var(--ink);
+}
+
+.atlas__launcher {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: #fff7e7;
+  border: 1px solid rgba(255, 247, 231, 0.24);
+  border-radius: 50%;
+  background: #243a33;
+}
+
+.atlas__launcher:hover {
+  background: #1b302a;
+}
+
+.atlas__panel {
+  position: absolute;
+  right: 0;
+  bottom: 64px;
+  display: grid;
+  width: min(390px, calc(100vw - 28px));
+  max-height: min(690px, calc(100vh - 110px));
+  grid-template-rows: auto minmax(210px, 1fr) auto auto;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.atlas__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f2e8d8;
+}
+
+.atlas__header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.atlas__header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.atlas__header button,
+.atlas__form button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.atlas__messages {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding: 14px;
+}
+
+.atlas__message {
+  width: fit-content;
+  max-width: 92%;
+  margin: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.atlas__message--user {
+  align-self: flex-end;
+  color: #fff7e7;
+  border-color: #617b55;
+  background: #4e6c5c;
+}
+
+.atlas__message--atlas {
+  align-self: flex-start;
+  background: #f7f1e6;
+}
+
+.atlas__prompts {
+  display: grid;
+  gap: 6px;
+  padding: 0 14px 14px;
+}
+
+.atlas__prompts button {
+  min-height: 34px;
+  padding: 7px 9px;
+  color: var(--ink-soft);
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 253, 248, 0.78);
+  font-size: 0.84rem;
+}
+
+.atlas__prompts button:hover {
+  border-color: var(--line-strong);
+  background: #f2e8d8;
+}
+
+.atlas__form {
+  display: grid;
+  grid-template-columns: 1fr 38px;
+  gap: 8px;
+  padding: 14px;
+  border-top: 1px solid var(--line);
+  background: #f2e8d8;
+}
+
+.atlas__form input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.atlas__form button:disabled,
+.atlas__prompts button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 680px) {
+  .atlas {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .atlas__panel {
+    bottom: 62px;
+  }
+}

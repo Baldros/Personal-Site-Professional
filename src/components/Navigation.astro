@@ -1,0 +1,36 @@
+---
+import { Github, Linkedin, Mail } from "lucide-astro";
+import { profile } from "../data/profile";
+
+const navItems = [
+  { label: "Expertise", href: "#expertise" },
+  { label: "Experience", href: "#experience" },
+  { label: "Projects", href: "#projects" },
+  { label: "Architecture", href: "#architecture" }
+];
+---
+
+<header class="nav-shell">
+  <nav class="nav container" aria-label="Primary navigation">
+    <a class="nav__brand" href="#top" aria-label="Go to top">
+      <img src={profile.avatarUrl} alt="" width="36" height="36" loading="eager" />
+      <span>{profile.name}</span>
+    </a>
+
+    <div class="nav__links" aria-label="Page sections">
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+    </div>
+
+    <div class="nav__actions" aria-label="External links">
+      <a href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub profile">
+        <Github size={18} strokeWidth={1.8} />
+      </a>
+      <a href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
+        <Linkedin size={18} strokeWidth={1.8} />
+      </a>
+      <a href={profile.links.email} aria-label="Email André">
+        <Mail size={18} strokeWidth={1.8} />
+      </a>
+    </div>
+  </nav>
+</header>

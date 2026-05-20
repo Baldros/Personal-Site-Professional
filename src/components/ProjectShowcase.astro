@@ -1,0 +1,24 @@
+---
+import { ArrowUpRight } from "lucide-astro";
+import { projects } from "../data/projects";
+---
+
+<div class="project-grid">
+  {projects.map((project) => (
+    <article class="project-card">
+      <div class="project-card__top">
+        <p>{project.status}</p>
+        {project.href && (
+          <a href={project.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.name}`}>
+            <ArrowUpRight size={18} strokeWidth={1.8} />
+          </a>
+        )}
+      </div>
+      <h3>{project.name}</h3>
+      <p>{project.body}</p>
+      <div class="tag-list">
+        {project.tags.map((tag) => <span>{tag}</span>)}
+      </div>
+    </article>
+  ))}
+</div>

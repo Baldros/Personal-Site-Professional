@@ -1,0 +1,41 @@
+---
+import AtlasDock from "./AtlasDock";
+import Navigation from "./Navigation.astro";
+import "../styles/global.css";
+import "../styles/atlas.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "André Amorim | Software & AI Engineer",
+  description = "Professional portfolio for André Amorim, focused on AI agents, software engineering, automation, and data science."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#181611" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Navigation />
+    <slot />
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p>André Amorim</p>
+        <p>Software, AI agents, automation, and scientific computing.</p>
+      </div>
+    </footer>
+    <AtlasDock client:idle />
+  </body>
+</html>

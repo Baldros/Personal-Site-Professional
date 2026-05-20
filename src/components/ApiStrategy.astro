@@ -1,0 +1,27 @@
+---
+import { apiPlatforms } from "../data/api-strategy";
+---
+
+<div class="api-grid">
+  {apiPlatforms.map((platform) => (
+    <article class="api-card">
+      <p class="api-card__posture">{platform.posture}</p>
+      <h3>{platform.name}</h3>
+      <p>{platform.summary}</p>
+      <div class="api-card__columns">
+        <div>
+          <h4>Can support</h4>
+          <ul>
+            {platform.capabilities.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h4>Boundaries</h4>
+          <ul>
+            {platform.constraints.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+    </article>
+  ))}
+</div>
