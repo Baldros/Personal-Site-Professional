@@ -22,15 +22,15 @@ the source of truth for the streaming UI. The integration is specified in
 boundary) and [atlas-contract.md](atlas-contract.md) (endpoints and the SSE event
 vocabulary).
 
-The current `AtlasDock` is intentionally small and runs a **local preview/mock**:
-it buffers a canned response from `/api/agent/stream` (`src/lib/agent/*`). The mock
-emits an AG-UI-style placeholder shape (`RUN_STARTED` / `TEXT_MESSAGE_CONTENT` /
-`RUN_FINISHED`); that is **not** what `atlasd` speaks. When the connection is built,
-the dock adopts the real `atlasd` event vocabulary (`thinking` / `answer_chunk` /
-`tool_*` / `delegate_*` / `message_end` / `done`) and streams incrementally instead
-of buffering — see [atlas-contract.md §3](atlas-contract.md).
+`AtlasDock` consumes the real `atlasd` event vocabulary (`thinking` /
+`answer_chunk` / `tool_*` / `message_end` / `done`) and streams incrementally via
+a `Response.body` reader. It connects to the backend through the server proxy when
+`ATLAS_ENABLED` is set, and otherwise serves a local preview — both over the same
+protocol (`src/lib/agent/protocol.ts`). See
+[atlas-integration.md](atlas-integration.md) and
+[atlas-contract.md §3](atlas-contract.md).
 
-AG-UI reference (for context only, not the implemented protocol): https://docs.ag-ui.com/introduction
+AG-UI reference (an earlier placeholder shape, not the implemented protocol): https://docs.ag-ui.com/introduction
 
 ## Runtime Boundaries
 

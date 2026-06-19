@@ -46,7 +46,7 @@ src/
   components/         UI components and React islands
   data/               Typed professional content and API strategy
   lib/
-    agent/            Atlas preview answers and streaming event helpers
+    agent/            Atlas backend client, event protocol, config, preview answers
     social/           Official social API provider registry
   pages/
     api/              Server endpoints

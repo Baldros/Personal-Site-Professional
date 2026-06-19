@@ -5,11 +5,13 @@ How this site talks to the Atlas backend (`atlasd`). This document defines the
 (endpoints, request bodies, SSE events) lives in
 [`atlas-contract.md`](atlas-contract.md).
 
-> **Status.** The site is *not* wired to `atlasd` yet. Today the Atlas dock runs
-> a local **preview/mock** (`src/lib/agent/answers.ts` served through
-> `src/pages/api/agent/stream.ts`). This document is the blueprint for replacing
-> that mock with a real connection to `atlasd`. No application code is changed by
-> this document — it is the contract the code will be written against.
+> **Status.** Implemented (config-driven), preview by default. The dock connects
+> to `atlasd` when `ATLAS_ENABLED=true` and `ATLAS_API_URL` is set; otherwise it
+> serves a local **preview** (`src/lib/agent/answers.ts`). Both paths speak the
+> same public event protocol (`src/lib/agent/protocol.ts`) through the server
+> proxy (`src/pages/api/agent/stream.ts` → `src/lib/agent/upstream.ts`). This
+> document is the contract that implementation follows; the topology choice (§2)
+> is still open and is pure configuration.
 
 ---
 
@@ -91,10 +93,11 @@ a `conversation_id`, forwarding the SSE stream, **translating the event vocabula
 (§4.1)**, stripping internal provenance the public site should not show (§4.2), and
 falling back to preview mode when `atlasd` is unreachable or has no agent (§6).
 
-### Configuration (server-side env — to be added)
+### Configuration (server-side env)
 
-> Documented here as the target; **not yet present** in `.env.example`. Adding
-> these vars is an implementation step, not part of this doc.
+> Implemented in `src/lib/agent/config.ts`, read from `process.env` at request
+> time, and present in `.env.example`. Server-side only — never exposed to the
+> browser.
 
 | Var | Purpose | Example |
 | --- | --- | --- |
@@ -111,28 +114,28 @@ The site MUST default to preview mode when `ATLAS_ENABLED` is unset/false or
 
 This is the largest gap between the current mock and a real connection.
 
-### 4.1 Two different vocabularies
+### 4.1 One vocabulary, end to end
 
-The current mock emits **AG-UI**-style events; `atlasd` emits its **own** event
-vocabulary. They are not the same and must be mapped in the proxy.
+The earlier mock emitted **AG-UI**-style events (`RUN_STARTED` /
+`TEXT_MESSAGE_CONTENT` / `RUN_FINISHED`); `atlasd` emits its **own** vocabulary.
+Rather than translate `atlasd` → AG-UI, the implementation **adopts the `atlasd`
+vocabulary as the source of truth**: the public protocol
+(`src/lib/agent/protocol.ts`) mirrors it, and the browser parses that one
+vocabulary whether the turn is served **live** or by **preview**.
 
-| Concern | Current mock (`src/lib/agent/agui.ts`) | `atlasd` (real) |
+| `atlasd` event | Public protocol | Rendered by the dock today |
 | --- | --- | --- |
-| Run start | `RUN_STARTED` | *(implicit; first event of the stream)* |
-| Message open | `TEXT_MESSAGE_START` | *(implicit; first `answer_chunk`)* |
-| Streamed text | `TEXT_MESSAGE_CONTENT` (`delta`) | `answer_chunk` (`text`) |
-| Message close | `TEXT_MESSAGE_END` | `message_end` (`final`) — *supervised, contract target* |
-| Run end | `RUN_FINISHED` | `done` (`status`) — **the single terminal event** |
-| Thinking | — | `thinking` |
-| Tool calls | — | `tool_start` / `tool_end` |
-| Delegation | — | `delegate_start` / `delegate_end` — *supervised, contract target* |
-| Error | *(handled client-side)* | `error` (then `done(failed)`) |
+| `answer_chunk` (`text`) | `answer_chunk` | yes — streamed delta |
+| `answer` (`text`) | `answer` | yes — appended |
+| `thinking` | `thinking` | forwarded; not rendered |
+| `tool_start` / `tool_end` | same, name/status only | forwarded; not rendered |
+| `message_end` (`final`) | `message_end` (`final`) | forwarded; not rendered |
+| `delegate_start` / `delegate_end` | **dropped** | — |
+| `error` → `done(failed)` | `error` / `done` | yes |
+| `done` (`status`) | `done` | yes — the single terminal event |
+| *(proxy meta)* | `status` (`mode`: live/preview) | yes — live/preview badge |
 
-The recommended direction is to **adopt the `atlasd` vocabulary as the source of
-truth** and have the proxy/client speak it directly, rather than translating
-`atlasd` → AG-UI. The mock's AG-UI shape was a placeholder; it is not what the
-backend speaks. The full event table is in
-[`atlas-contract.md` §3](atlas-contract.md).
+The full backend event table is in [`atlas-contract.md` §3](atlas-contract.md).
 
 ### 4.2 Public-surface filtering
 
@@ -155,11 +158,10 @@ refuses to make the decision for it.
 
 ### 4.3 Streaming, for real
 
-The current `AtlasDock.tsx` does `await response.text()` and parses the whole body
-at once — it is **not** streaming, it just replays a finished response. A real
-connection should read the SSE body incrementally (`Response.body` reader / parse
-`event:`/`data:` frames as they arrive) so tokens appear live. The terminal signal
-is the `done` event, **not** end-of-body.
+`AtlasDock.tsx` reads the SSE body incrementally via a `Response.body` reader and
+the shared `createSseParser`, appending `answer_chunk` text as it arrives, so
+tokens appear live. The terminal signal is the `done` event, **not** end-of-body
+(the proxy also emits a terminal `done` if the upstream omits one).
 
 ---
 
@@ -200,23 +202,33 @@ exactly the hollow-broker reality of §1.
 
 ---
 
-## 7. Readiness checklist (for the implementation that follows these docs)
+## 7. Readiness checklist
 
-This doc changes no code. When the connection is built, it should satisfy:
+Status of the implementation in this branch:
 
-- [ ] `ATLAS_API_URL` / `ATLAS_ENABLED` / `ATLAS_REQUEST_TIMEOUT_MS` read
-      server-side only; preview mode is the default when unset.
-- [ ] `/api/agent/stream` proxies to `{ATLAS_API_URL}/v1/chat/stream` and forwards
+- [x] `ATLAS_API_URL` / `ATLAS_ENABLED` / `ATLAS_REQUEST_TIMEOUT_MS` read
+      server-side only; preview mode is the default when unset
+      (`src/lib/agent/config.ts`).
+- [x] `/api/agent/stream` proxies to `{ATLAS_API_URL}/v1/chat/stream` and forwards
       SSE incrementally (no full-body buffering).
-- [ ] A `conversation_id` is created via `POST /v1/conversations` (or generated and
-      sent) and reused across a session — see [`atlas-contract.md` §2](atlas-contract.md).
-- [ ] The proxy maps the `atlasd` event vocabulary (§4.1) and applies public-surface
-      filtering (§4.2).
-- [ ] `done` is treated as the single terminal event; `error`→`done(failed)` is
-      handled; client disconnect → `done(cancelled)` is tolerated.
-- [ ] The four degradation cases (§6) are implemented, including the distinct
-      no-agent state.
-- [ ] No model keys or the `atlasd` URL ever reach the browser (§5).
+- [x] A `conversation_id` is generated client-side, sent each turn, and registered
+      idempotently via `POST /v1/conversations` — see
+      [`atlas-contract.md` §2](atlas-contract.md).
+- [x] The proxy speaks the `atlasd` event vocabulary (§4.1) and applies
+      public-surface filtering (§4.2) — verified: `delegate_*` dropped, tool
+      args/results and provenance stripped.
+- [x] `done` is the single terminal event; `error`→`done(failed)` is handled;
+      client disconnect aborts the upstream and stops quietly.
+- [x] The degradation cases (§6) are implemented: disabled → preview, unreachable/
+      timeout → preview, no-agent → upstream `error` surfaced.
+- [x] No model keys or the `atlasd` URL ever reach the browser (§5).
+
+Deferred (not blocking this increment):
+
+- [ ] Topology selection (A vs B, §2) — pure configuration.
+- [ ] Owner-hosted (B) hardening: origin checks, rate limiting, per-session budget
+      caps (§5).
+- [ ] Optional UX: render `thinking` / `tool_*` as a "working…" indicator.
 
 ---
 
