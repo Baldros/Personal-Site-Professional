@@ -7,6 +7,11 @@ The site is designed to work in two layers:
 1. A fast professional portfolio with structured content, SEO-friendly pages, and refined visual design.
 2. A server-ready layer for Atlas, OAuth, and official platform APIs.
 
+The Atlas dock currently runs a local preview/mock. The contract for wiring it to
+the real Atlas backend (`atlasd`) is specified in
+[docs/atlas-integration.md](docs/atlas-integration.md) and
+[docs/atlas-contract.md](docs/atlas-contract.md).
+
 ## Stack
 
 - Bun for local package management and scripts.
@@ -41,7 +46,7 @@ src/
   components/         UI components and React islands
   data/               Typed professional content and API strategy
   lib/
-    agent/            Atlas preview answers and streaming event helpers
+    agent/            Atlas backend client, event protocol, config, preview answers
     social/           Official social API provider registry
   pages/
     api/              Server endpoints
