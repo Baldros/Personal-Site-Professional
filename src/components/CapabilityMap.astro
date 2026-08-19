@@ -2,11 +2,9 @@
 import {
   BarChart3,
   BrainCircuit,
-  Database,
   Layers,
   Satellite,
   Search,
-  Share2,
   Terminal
 } from "lucide-astro";
 
@@ -18,85 +16,143 @@ const methodTags = [
   "Power BI",
   "Scientific computing",
   "Remote sensing",
-  "Official APIs",
   "Decision support",
   "Internal tooling",
   "Python",
-  "TypeScript"
+  "TypeScript",
+  "Go"
 ];
 
+/**
+ * Six, not eight. The two that were cut — a social-API card and a standalone
+ * retrieval/enterprise split — described roadmap rather than shipped evidence,
+ * and on a page whose job is to route people to projects, an eight-cell grid
+ * competes with the work instead of framing it.
+ */
 const capabilities = [
   {
     title: "Agentic AI systems",
     icon: BrainCircuit,
-    body: "Assistants that connect language models to tools, workflows, files, and verified context.",
+    body: "Assistants that connect language models to tools, workflows, files and verified context — including the orchestration layer underneath them.",
     tags: ["Agents", "LangGraph", "MCP"]
   },
   {
     title: "Retrieval and search",
     icon: Search,
-    body: "Knowledge systems that turn documentation, repositories, and operational context into usable answers.",
+    body: "Knowledge systems that turn documentation, repositories and operational context into answers that cite where they came from.",
     tags: ["RAG", "Enterprise search", "Docs"]
+  },
+  {
+    title: "Local tool bridges",
+    icon: Terminal,
+    body: "CLI utilities that let assistants operate real local and cloud workflows through explicit, auditable tools rather than screen scraping.",
+    tags: ["CLI", "Google APIs", "YouTube"]
   },
   {
     title: "Workflow automation",
     icon: Layers,
-    body: "Practical automation across CRM, reporting, internal operations, and repetitive business processes.",
+    body: "Practical automation across CRM, reporting, internal operations and the repetitive business processes nobody wants to own.",
     tags: ["Power Platform", "Python", "Ops"]
   },
   {
     title: "Data products",
     icon: BarChart3,
-    body: "Models, dashboards, and decision layers built around business questions rather than isolated charts.",
+    body: "Models, dashboards and decision layers built around a business question rather than around an isolated chart.",
     tags: ["BI", "ML", "Statistics"]
   },
   {
     title: "Scientific computing",
-    icon: Database,
-    body: "Numerical and engineering workflows shaped by simulation, environmental data, and research habits.",
-    tags: ["CFD context", "Models", "Analysis"]
-  },
-  {
-    title: "Remote sensing",
     icon: Satellite,
-    body: "Satellite and atmospheric data workflows for environmental intelligence and spatial analysis.",
-    tags: ["Earth Engine", "R", "Geospatial"]
-  },
-  {
-    title: "Local tool bridges",
-    icon: Terminal,
-    body: "CLI utilities that let assistants operate real local and cloud workflows through explicit tools.",
-    tags: ["CLI", "Google APIs", "YouTube"]
-  },
-  {
-    title: "Social API layer",
-    icon: Share2,
-    body: "Official LinkedIn, TikTok, and X integrations behind explicit OAuth, scope, and spend boundaries.",
-    tags: ["OAuth", "LinkedIn", "Governance"]
+    body: "Numerical and engineering workflows shaped by simulation, satellite and atmospheric data, and research habits that predate the AI work.",
+    tags: ["Earth Engine", "Models", "Geospatial"]
   }
 ];
 ---
 
-<div class="method-tag-rail" aria-label="Methods and technologies">
-  {methodTags.map((tag) => <span>{tag}</span>)}
+<div class="method-rail" aria-label="Methods and technologies">
+  {methodTags.map((tag) => <span class="tag">{tag}</span>)}
 </div>
 
-<div class="capability-grid">
-  {
-    capabilities.map((capability, index) => {
-      const Icon = capability.icon;
+<div class="capability-grid" data-reveal-group>
+  {capabilities.map((capability, index) => {
+    const Icon = capability.icon;
 
-      return (
-        <article class="capability-card" data-reveal data-reveal-delay={index * 35}>
-          <span class="capability-card__index">{String(index + 1).padStart(2, "0")}</span>
-          <Icon size={24} strokeWidth={1.7} aria-hidden="true" />
-          <h3>{capability.title}</h3>
-          <p>{capability.body}</p>
-          <div class="tag-list">
-            {capability.tags.map((tag) => <span>{tag}</span>)}
-          </div>
-        </article>
-      );
-    })
+    return (
+      <article class="capability">
+        <span class="meta capability__index">{String(index + 1).padStart(2, "0")}</span>
+        <Icon size={22} strokeWidth={1.6} aria-hidden="true" />
+        <h3>{capability.title}</h3>
+        <p>{capability.body}</p>
+        <div class="tag-row">
+          {capability.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      </article>
+    );
+  })}
+</div>
+
+<style>
+  .method-rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-7);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--line);
   }
-</div>
+
+  .capability-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .capability {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--void);
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .capability:hover {
+    background: var(--surface);
+  }
+
+  .capability :global(svg) {
+    color: var(--accent);
+  }
+
+  .capability__index {
+    color: var(--text-mute);
+  }
+
+  .capability h3 {
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+  }
+
+  .capability p {
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .capability .tag-row {
+    margin-top: var(--space-2);
+  }
+
+  @media (max-width: 980px) {
+    .capability-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .capability-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

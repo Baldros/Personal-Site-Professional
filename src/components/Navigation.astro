@@ -2,36 +2,294 @@
 import { Github, Linkedin, Mail } from "lucide-astro";
 import { profile } from "../data/profile";
 
-const navItems = [
-  { label: "Capabilities", href: "#expertise" },
-  { label: "Value", href: "#value" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects", href: "#projects" },
-  { label: "APIs", href: "#apis" }
+type NavTarget = { label: string; href: string };
+
+type Props = { targets?: NavTarget[] };
+
+const defaultTargets: NavTarget[] = [
+  { label: "Work", href: "/#work" },
+  { label: "Atlas", href: "/atlas" },
+  { label: "Capabilities", href: "/#capabilities" },
+  { label: "Experience", href: "/#experience" },
+  { label: "Contact", href: "/#contact" }
 ];
+
+const { targets = defaultTargets } = Astro.props;
 ---
 
-<header class="nav-shell">
-  <nav class="nav container" aria-label="Primary navigation">
-    <a class="nav__brand" href="#top" aria-label="Go to top">
-      <img src={profile.avatarUrl} alt="" width="36" height="36" loading="eager" />
-      <span>{profile.name}</span>
+<header class="nav-shell" data-nav>
+  <nav class="nav container--wide" aria-label="Primary">
+    <a class="nav__brand" href="/" aria-label="Home">
+      <span class="nav__mark" aria-hidden="true"></span>
+      <span class="nav__name">{profile.name}</span>
     </a>
 
-    <div class="nav__links" aria-label="Page sections">
-      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+    <div class="nav__links">
+      {targets.map((target) => <a class="link-line" href={target.href}>{target.label}</a>)}
     </div>
 
-    <div class="nav__actions" aria-label="External links">
-      <a href={profile.links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
-        <Github size={18} strokeWidth={1.8} />
+    <div class="nav__actions">
+      <a href={profile.links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <Github size={17} strokeWidth={1.7} />
       </a>
-      <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
-        <Linkedin size={18} strokeWidth={1.8} />
+      <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <Linkedin size={17} strokeWidth={1.7} />
       </a>
-      <a href={profile.links.email} aria-label="Email André">
-        <Mail size={18} strokeWidth={1.8} />
+      <a href={profile.links.email} aria-label="Email">
+        <Mail size={17} strokeWidth={1.7} />
       </a>
     </div>
+
+    <button
+      class="nav__toggle"
+      type="button"
+      data-nav-toggle
+      aria-expanded="false"
+      aria-controls="nav-panel"
+    >
+      <span class="nav__toggle-bars" aria-hidden="true"><i></i><i></i></span>
+      <span class="nav__toggle-label">Menu</span>
+    </button>
   </nav>
 </header>
+
+<!-- Mobile panel. Below 900px the desktop links are hidden, and before this
+     existed that simply meant the site had no navigation at all on a phone. -->
+<div class="nav-panel" id="nav-panel" data-nav-panel hidden>
+  <div class="nav-panel__inner">
+    {targets.map((target, index) => (
+      <a href={target.href}>
+        <span class="meta">{String(index + 1).padStart(2, "0")}</span>
+        <span class="nav-panel__label">{target.label}</span>
+      </a>
+    ))}
+  </div>
+  <div class="nav-panel__foot">
+    <a class="link-line" href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a class="link-line" href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    <a class="link-line" href={profile.links.email}>Email</a>
+  </div>
+</div>
+
+<style>
+  .nav-shell {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-nav);
+    width: 100%;
+    border-bottom: 1px solid transparent;
+    background: linear-gradient(to bottom, rgba(8, 9, 11, 0.92), rgba(8, 9, 11, 0));
+    backdrop-filter: blur(10px);
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      background var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out);
+  }
+
+  .nav-shell.is-stuck {
+    background: var(--overlay);
+    border-bottom-color: var(--line);
+  }
+
+  /* Recede on the way down, return on the way up — gives content the full
+     viewport while reading without ever making the nav hard to reach. */
+  .nav-shell.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  .nav {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-4);
+  }
+
+  .nav__brand {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .nav__mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    box-shadow: 0 0 12px rgba(74, 158, 224, 0.7);
+  }
+
+  .nav__links {
+    display: flex;
+    gap: var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+  }
+
+  .nav__links a:hover {
+    color: var(--text);
+  }
+
+  .nav__actions {
+    display: flex;
+    gap: var(--space-4);
+    color: var(--text-soft);
+  }
+
+  .nav__actions a:hover {
+    color: var(--accent);
+  }
+
+  .nav__toggle {
+    display: none;
+    gap: var(--space-3);
+    align-items: center;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: none;
+    border: 0;
+  }
+
+  .nav__toggle-bars {
+    display: grid;
+    gap: 5px;
+    width: 22px;
+  }
+
+  .nav__toggle-bars i {
+    display: block;
+    height: 1px;
+    background: var(--text);
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  .nav__toggle[aria-expanded="true"] .nav__toggle-bars i:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .nav__toggle[aria-expanded="true"] .nav__toggle-bars i:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  .nav-panel {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-menu);
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: var(--space-11) var(--gutter) var(--space-7);
+    background: var(--void);
+  }
+
+  .nav-panel[hidden] {
+    display: none;
+  }
+
+  .nav-panel__inner {
+    display: grid;
+    align-content: center;
+    gap: var(--space-2);
+  }
+
+  .nav-panel__inner a {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-panel__label {
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  .nav-panel__foot {
+    display: flex;
+    gap: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 900px) {
+    .nav__links,
+    .nav__actions {
+      display: none;
+    }
+
+    .nav__toggle {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  const setupNav = () => {
+    const shell = document.querySelector<HTMLElement>("[data-nav]");
+    const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+    const panel = document.querySelector<HTMLElement>("[data-nav-panel]");
+    if (!shell || !toggle || !panel) return;
+
+    let lastY = window.scrollY;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      shell.classList.toggle("is-stuck", y > 40);
+      // Never retract while the mobile panel is open, or the close control
+      // goes with it.
+      const menuOpen = toggle.getAttribute("aria-expanded") === "true";
+      shell.classList.toggle("is-hidden", !menuOpen && y > 320 && y > lastY);
+      lastY = y;
+    };
+
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      document.body.style.overflow = open ? "hidden" : "";
+      if (!open) shell.classList.remove("is-hidden");
+    };
+
+    const onToggle = () => setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    const onPanelClick = (event: MouseEvent) => {
+      if ((event.target as HTMLElement).closest("a")) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    toggle.addEventListener("click", onToggle);
+    panel.addEventListener("click", onPanelClick);
+    document.addEventListener("keydown", onKey);
+    onScroll();
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        window.removeEventListener("scroll", onScroll);
+        document.removeEventListener("keydown", onKey);
+        document.body.style.overflow = "";
+      },
+      { once: true }
+    );
+  };
+
+  document.addEventListener("astro:page-load", setupNav);
+</script>

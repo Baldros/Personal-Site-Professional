@@ -2,21 +2,106 @@
 import { experiences } from "../data/experience";
 ---
 
-<div class="timeline">
-  {experiences.map((item, index) => (
-    <article class="timeline__item" data-reveal data-reveal-delay={index * 45}>
+<ol class="timeline">
+  {experiences.map((item) => (
+    <li class="timeline__item" data-reveal>
       <div class="timeline__meta">
-        <span>{item.period}</span>
-        <span>{item.location}</span>
+        <span class="meta">{item.period}</span>
+        <span class="meta timeline__place">{item.location}</span>
       </div>
+
       <div class="timeline__body">
         <h3>{item.role}</h3>
         <p class="timeline__company">{item.company}</p>
-        <p>{item.body}</p>
-        <div class="tag-list">
-          {item.stack.map((tag) => <span>{tag}</span>)}
+        <p class="timeline__copy">{item.body}</p>
+        <div class="tag-row">
+          {item.stack.map((tag) => <span class="tag">{tag}</span>)}
         </div>
       </div>
-    </article>
+    </li>
   ))}
-</div>
+</ol>
+
+<style>
+  .timeline {
+    display: grid;
+    counter-reset: role;
+  }
+
+  .timeline__item {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--line);
+  }
+
+  .timeline__item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .timeline__meta {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    position: relative;
+    padding-left: var(--space-5);
+  }
+
+  /* The dot sits on the column edge and lights up on hover, which gives the
+     list a spine without needing a drawn rule. */
+  .timeline__meta::before {
+    position: absolute;
+    top: 0.5em;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    content: "";
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition:
+      background var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out);
+  }
+
+  .timeline__item:hover .timeline__meta::before {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .timeline__meta .meta:first-child {
+    color: var(--text-soft);
+  }
+
+  .timeline__place {
+    color: var(--text-mute);
+  }
+
+  .timeline__body {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .timeline__body h3 {
+    font-size: var(--step-2);
+    letter-spacing: -0.015em;
+  }
+
+  .timeline__company {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--accent);
+  }
+
+  .timeline__copy {
+    max-width: 66ch;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 820px) {
+    .timeline__item {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+  }
+</style>

@@ -2,14 +2,16 @@
 type Props = {
   eyebrow: string;
   title: string;
-  body: string;
+  body?: string;
+  /** Lets the calling section point `aria-labelledby` at this heading. */
+  titleId?: string;
 };
 
-const { eyebrow, title, body } = Astro.props;
+const { eyebrow, title, body, titleId } = Astro.props;
 ---
 
 <div class="section-heading">
   <p class="eyebrow">{eyebrow}</p>
-  <h2>{title}</h2>
-  <p>{body}</p>
+  <h2 id={titleId} data-split>{title}</h2>
+  {body && <p>{body}</p>}
 </div>

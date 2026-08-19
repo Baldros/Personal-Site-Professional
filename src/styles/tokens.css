@@ -1,0 +1,113 @@
+/* =============================================================================
+   Design tokens — dark cinematic
+   -----------------------------------------------------------------------------
+   Single source of truth for colour, type, space, depth and motion.
+   Nothing in this file draws anything; it only names values.
+
+   The accent ramp is the real Atlas brand gradient, lifted from the product's
+   own logo component (UI-Desktop-Agent/src/renderer/src/app/components/
+   AtlasLogo.tsx). Portfolio and product therefore share one identity instead
+   of inventing a second one.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* --- surfaces ---------------------------------------------------------- */
+  --void: #08090b;          /* page ground */
+  --surface: #0f1115;       /* raised panel */
+  --surface-2: #161920;     /* card */
+  --surface-3: #1e222b;     /* card hover / input */
+  --overlay: rgba(8, 9, 11, 0.72);
+
+  /* --- text -------------------------------------------------------------- */
+  --text: #f2f3f5;
+  --text-soft: #a8adb6;
+  --text-mute: #6b717c;
+  --text-invert: #08090b;
+
+  /* --- lines ------------------------------------------------------------- */
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --line-accent: rgba(74, 158, 224, 0.35);
+
+  /* --- accent (Atlas brand ramp) ----------------------------------------- */
+  --accent: #4a9ee0;
+  --accent-mid: #3b8ed0;
+  --accent-deep: #2d6fa3;
+  --accent-dim: rgba(74, 158, 224, 0.12);
+  --accent-gradient: linear-gradient(135deg, #4a9ee0 0%, #3b8ed0 50%, #2d6fa3 100%);
+
+  /* --- signal ------------------------------------------------------------ */
+  --signal: #10b981;
+  --alert: #ef4444;
+  --warn: #f5a524;
+
+  /* --- type families ----------------------------------------------------- */
+  --font-display: Anton, "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+
+  /* --- type scale (fluid, 390px -> 1600px viewport) ---------------------- */
+  --step--2: clamp(0.69rem, 0.67rem + 0.09vw, 0.75rem);
+  --step--1: clamp(0.83rem, 0.79rem + 0.16vw, 0.94rem);
+  --step-0: clamp(1rem, 0.95rem + 0.22vw, 1.13rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.36vw, 1.44rem);
+  --step-2: clamp(1.44rem, 1.31rem + 0.57vw, 1.83rem);
+  --step-3: clamp(1.73rem, 1.53rem + 0.87vw, 2.33rem);
+  --step-4: clamp(2.07rem, 1.77rem + 1.3vw, 2.96rem);
+  --step-5: clamp(2.49rem, 2.05rem + 1.9vw, 3.76rem);
+  --step-6: clamp(2.99rem, 2.36rem + 2.72vw, 4.78rem);
+  /* display sizes intentionally break the scale — they are viewport-driven */
+  --step-display: clamp(3.2rem, 11vw, 11rem);
+  --step-display-sm: clamp(2.6rem, 7.5vw, 7rem);
+
+  /* --- space scale ------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --space-11: 11rem;
+  --space-12: 15rem;
+  --section-y: clamp(5rem, 11vh, 9rem);
+
+  /* --- layout ------------------------------------------------------------ */
+  --container: 1240px;
+  --container-wide: 1560px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --radius-sm: 4px;
+  --radius: 10px;
+  --radius-lg: 18px;
+
+  /* --- depth (z scale — no more magic numbers) --------------------------- */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dots: 20;
+  --z-nav: 30;
+  --z-dock: 40;
+  --z-menu: 50;
+  --z-cursor: 60;
+  --z-skip: 70;
+
+  /* --- shadow ------------------------------------------------------------ */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 60px rgba(74, 158, 224, 0.18);
+
+  /* --- motion ------------------------------------------------------------ */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 180ms;
+  --dur-2: 320ms;
+  --dur-3: 520ms;
+  --dur-4: 900ms;
+}

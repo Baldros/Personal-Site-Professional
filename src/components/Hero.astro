@@ -1,130 +1,162 @@
 ---
-import { ArrowDown, FileText, Github, Linkedin } from "lucide-astro";
+import { ArrowDown, ArrowUpRight } from "lucide-astro";
 import { profile } from "../data/profile";
+
+const [firstName, ...rest] = profile.name.split(" ");
+const lastName = rest.join(" ");
 ---
 
-<section class="hero" id="top" aria-labelledby="hero-title">
+<section class="hero" id="top" aria-labelledby="hero-title" data-parallax-scope>
   <canvas class="hero__canvas" data-signal-canvas aria-hidden="true"></canvas>
+  <div class="hero__glow" aria-hidden="true" data-parallax="0.18"></div>
 
-  <div class="hero__content container">
-    <div class="hero__copy">
-      <p class="eyebrow">Software & AI Engineering · Rio de Janeiro</p>
-      <h1 id="hero-title">{profile.name}</h1>
-      <p class="hero__lead">{profile.headline}</p>
+  <div class="hero__inner container--wide">
+    <p class="eyebrow hero__eyebrow">
+      {profile.role} — {profile.location}
+    </p>
 
-      <div class="hero__actions" aria-label="Primary actions">
-        <a class="button button--primary" href="#projects">
-          <span>View work</span>
-          <ArrowDown size={18} strokeWidth={1.8} />
+    <h1 class="hero__title display" id="hero-title">
+      <span class="hero__line text-gradient" data-parallax="-0.05">{firstName}</span>
+      <span class="hero__line hero__line--indent" data-parallax="-0.12">{lastName}</span>
+    </h1>
+
+    <div class="hero__body">
+      <p class="hero__lead" data-split>{profile.headline}</p>
+
+      <div class="hero__actions">
+        <a class="button button--primary" href="#work" data-magnetic="0.28">
+          <span>See the work</span>
+          <ArrowDown size={16} strokeWidth={1.9} />
         </a>
-        <a class="button" href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">
-          <Linkedin size={18} strokeWidth={1.8} />
-          <span>LinkedIn</span>
-        </a>
-        <a class="button button--icon" href={profile.links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
-          <Github size={18} strokeWidth={1.8} />
-        </a>
-        <a class="button button--icon" href={profile.links.lattes} target="_blank" rel="noopener noreferrer" aria-label="Lattes CV">
-          <FileText size={18} strokeWidth={1.8} />
+        <a class="button" href="/atlas" data-magnetic="0.28">
+          <span>Atlas case study</span>
+          <ArrowUpRight size={16} strokeWidth={1.9} />
         </a>
       </div>
     </div>
 
-    <figure class="hero__visual">
-      <img
-        src={profile.avatarUrl}
-        alt={`Portrait of ${profile.name}`}
-        width="260"
-        height="260"
-        loading="eager"
-        decoding="async"
-        fetchpriority="high"
-      />
-      <figcaption>
-        <span>{profile.role}</span>
-        <strong>{profile.location}</strong>
-      </figcaption>
-    </figure>
-
-    <div class="hero__proof" aria-label="Professional proof points">
-      {profile.proofPoints.map((point) => <span>{point}</span>)}
-    </div>
+    <ul class="hero__proof" aria-label="Focus areas">
+      {profile.proofPoints.map((point, index) => (
+        <li>
+          <span class="meta">{String(index + 1).padStart(2, "0")}</span>
+          <span>{point}</span>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
-<script>
-  const canvas = document.querySelector("[data-signal-canvas]") as HTMLCanvasElement | null;
-
-  if (canvas) {
-    const context = canvas.getContext("2d");
-    const pointer = { x: 0.5, y: 0.5 };
-    const points = Array.from({ length: 48 }, (_, index) => ({
-      x: (index % 12) / 11,
-      y: Math.floor(index / 12) / 3,
-      phase: index * 0.37
-    }));
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const scale = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(rect.width * scale);
-      canvas.height = Math.floor(rect.height * scale);
-      context?.setTransform(scale, 0, 0, scale, 0, 0);
-    };
-
-    const draw = (time: number) => {
-      if (!context) return;
-
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      context.clearRect(0, 0, width, height);
-      context.fillStyle = "#111716";
-      context.fillRect(0, 0, width, height);
-
-      const t = time * 0.00035;
-      const plotted = points.map((point) => {
-        const drift = Math.sin(t + point.phase) * 18;
-        const influenceX = (pointer.x - 0.5) * 18;
-        const influenceY = (pointer.y - 0.5) * 18;
-        return {
-          x: point.x * width + drift + influenceX,
-          y: point.y * height + Math.cos(t + point.phase) * 16 + influenceY
-        };
-      });
-
-      context.strokeStyle = "rgba(230, 223, 208, 0.17)";
-      context.lineWidth = 1;
-      plotted.forEach((point, index) => {
-        for (let next = index + 1; next < plotted.length; next += 1) {
-          const target = plotted[next];
-          const distance = Math.hypot(point.x - target.x, point.y - target.y);
-          if (distance < 155) {
-            context.globalAlpha = Math.max(0, 1 - distance / 155);
-            context.beginPath();
-            context.moveTo(point.x, point.y);
-            context.lineTo(target.x, target.y);
-            context.stroke();
-          }
-        }
-      });
-
-      context.globalAlpha = 1;
-      plotted.forEach((point, index) => {
-        context.fillStyle = index % 5 === 0 ? "#c8934a" : index % 3 === 0 ? "#6f8c79" : "#d8d1c3";
-        context.fillRect(point.x - 1.5, point.y - 1.5, 3, 3);
-      });
-
-      context.fillStyle = "rgba(17, 23, 22, 0.5)";
-      context.fillRect(0, 0, width, height);
-      requestAnimationFrame(draw);
-    };
-
-    window.addEventListener("resize", resize);
-    window.addEventListener("pointermove", (event) => {
-      pointer.x = event.clientX / Math.max(1, window.innerWidth);
-      pointer.y = event.clientY / Math.max(1, window.innerHeight);
-    });
-    resize();
-    requestAnimationFrame(draw);
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100svh;
+    /* Enough top padding to clear the fixed nav, no more: the section aligns
+       its content to the bottom, so anything extra pushes the hero past one
+       viewport on short laptop screens. */
+    padding-block: var(--space-9) var(--space-7);
+    overflow: hidden;
+    isolation: isolate;
   }
-</script>
+
+  .hero__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Plane 1 of the parallax stack: a slow, soft light source behind the type.
+     Planes 2 and 3 are the two title lines, which travel at different rates —
+     that difference is the entire multi-plane effect, no 3D involved. */
+  .hero__glow {
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    z-index: -1;
+    width: min(120vw, 1500px);
+    aspect-ratio: 2 / 1;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(74, 158, 224, 0.2) 0%,
+      rgba(45, 111, 163, 0.07) 42%,
+      transparent 68%
+    );
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: clamp(var(--space-4), 2.2vh, var(--space-6));
+    width: min(100% - (var(--gutter) * 2), var(--container-wide));
+  }
+
+  .hero__eyebrow {
+    color: var(--text-soft);
+  }
+
+  .hero__title {
+    display: grid;
+    margin-block: var(--space-2);
+  }
+
+  .hero__line {
+    display: block;
+  }
+
+  /* The second line is drawn as an outline instead of a fill, so the two lines
+     read as different planes even before they start moving apart. */
+  .hero__line--indent {
+    margin-left: 0.09em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--line-strong);
+  }
+
+  /* Single column, actions under the lead. A right-hand action column put the
+     buttons underneath the fixed Atlas dock at desktop widths. */
+  .hero__body {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .hero__lead {
+    max-width: 46ch;
+    font-size: var(--step-1);
+    color: var(--text-soft);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .hero__proof {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    padding-top: var(--space-5);
+    /* Room for the fixed dock in the bottom-right corner. */
+    padding-right: clamp(0px, 6vw, 84px);
+    border-top: 1px solid var(--line);
+  }
+
+  .hero__proof li {
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 900px) {
+    .hero__proof {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

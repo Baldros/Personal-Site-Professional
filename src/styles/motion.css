@@ -1,0 +1,270 @@
+/* =============================================================================
+   Motion layer
+   -----------------------------------------------------------------------------
+   Division of labour, deliberate:
+
+     CSS (this file)  -> reveals, hovers, ambient loops. Runs off the main
+                         thread via scroll-driven animations. 0 KB of JS.
+     GSAP (src/lib/motion) -> only what CSS genuinely cannot do: pinning,
+                         scrubbing a timeline, sequenced multi-element
+                         choreography, per-line text splitting, magnetic cursor.
+
+   Progressive enhancement rule: the *default* state of every element here is
+   VISIBLE. The hidden-then-animate state is applied only inside
+   `@supports (animation-timeline: view())`. A browser without scroll-driven
+   animations shows a complete, static page rather than a blank one — and there
+   is no JS in the critical path that could fail and leave content invisible.
+   ========================================================================== */
+
+@property --sweep {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+/* --- reveal on scroll (CSS-only) ----------------------------------------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 26%;
+    }
+
+    [data-reveal="fade"] {
+      animation-name: reveal-fade;
+    }
+
+    [data-reveal="scale"] {
+      animation-name: reveal-scale;
+    }
+
+    [data-reveal="left"] {
+      animation-name: reveal-left;
+    }
+
+    /* Stagger children of a group without touching markup order. */
+    [data-reveal-group] > * {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 34px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-40px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- scroll progress rail ------------------------------------------------ */
+@supports (animation-timeline: scroll()) {
+  .scroll-rail__fill {
+    transform-origin: 0 50%;
+    animation: rail-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+
+@keyframes rail-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* --- ambient loops -------------------------------------------------------- */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@keyframes ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ring-spin-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* --- text split (GSAP SplitText writes these elements) -------------------- */
+.split-line {
+  display: block;
+  overflow: hidden;
+}
+
+.split-line__inner {
+  display: block;
+  will-change: transform;
+}
+
+/* --- parallax planes ------------------------------------------------------ */
+[data-parallax] {
+  will-change: transform;
+}
+
+/* --- custom cursor -------------------------------------------------------- */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  display: none;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  pointer-events: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.cursor::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  content: "";
+  background: var(--text);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cursor.is-active {
+  display: block;
+}
+
+.cursor.is-hovering {
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: transparent;
+}
+
+.cursor,
+.cursor.is-hovering {
+  transition:
+    width var(--dur-2) var(--ease-out),
+    height var(--dur-2) var(--ease-out),
+    margin var(--dur-2) var(--ease-out),
+    background var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+
+/* Only hide the native cursor once ours is actually running. */
+html.has-custom-cursor,
+html.has-custom-cursor a,
+html.has-custom-cursor button {
+  cursor: none;
+}
+
+[data-magnetic] {
+  will-change: transform;
+}
+
+/* =============================================================================
+   Reduced motion — the whole layer collapses to nothing.
+   src/lib/motion/index.ts additionally refuses to mount Lenis, the hero canvas
+   and every ScrollTrigger under the same media query, so this is belt AND
+   braces rather than a cosmetic override.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal],
+  [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .cursor {
+    display: none !important;
+  }
+
+  html.has-custom-cursor,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button {
+    cursor: auto;
+  }
+}

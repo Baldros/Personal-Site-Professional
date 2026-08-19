@@ -1,0 +1,726 @@
+---
+import { ArrowLeft, ArrowUpRight, Check, Circle } from "lucide-astro";
+import AtlasDiagram from "../components/AtlasDiagram.astro";
+import AtlasMark from "../components/AtlasMark.astro";
+import Layout from "../components/Layout.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { atlas } from "../data/atlas";
+
+const navTargets = [
+  { label: "Back to work", href: "/#work" },
+  { label: "Architecture", href: "#architecture" },
+  { label: "Clients", href: "#clients" },
+  { label: "Status", href: "#status" }
+];
+
+const dots = [
+  { id: "atlas-top", label: "Atlas" },
+  { id: "thesis", label: "Thesis" },
+  { id: "rewrite", label: "The rewrite" },
+  { id: "architecture", label: "Architecture" },
+  { id: "clients", label: "Clients" },
+  { id: "decisions", label: "Decisions" },
+  { id: "status", label: "Status" }
+];
+---
+
+<Layout
+  title="Atlas — a desktop AI assistant whose backend contains no AI"
+  description="Case study: rewriting Atlas from a Python/LangGraph monolith into a 14,649-line pure-Go hollow broker that supervises external agents over one language-agnostic contract."
+  navTargets={navTargets}
+  dots={dots}
+>
+  <main id="main">
+    <!-- ═══ 01 · hero ══════════════════════════════════════════════════ -->
+    <section class="case-hero" id="atlas-top" aria-labelledby="atlas-title" data-parallax-scope>
+      <div class="case-hero__wash" aria-hidden="true" data-parallax="0.2"></div>
+
+      <div class="container--wide case-hero__inner">
+        <a class="case-hero__back link-line" href="/#work">
+          <ArrowLeft size={14} strokeWidth={1.9} />
+          <span class="meta">Selected work</span>
+        </a>
+
+        <div class="case-hero__head">
+          <span class="case-hero__mark" aria-hidden="true" data-parallax="-0.08">
+            <AtlasMark size={140} />
+          </span>
+          <h1 class="display text-gradient case-hero__title" id="atlas-title">{atlas.name}</h1>
+        </div>
+
+        <p class="case-hero__tagline" data-split>{atlas.tagline}</p>
+
+        <div class="case-hero__body">
+          <p class="case-hero__intro">{atlas.intro}</p>
+
+          <div class="case-hero__side">
+            <div class="case-hero__row">
+              <span class="meta">Period</span>
+              <span>{atlas.period}</span>
+            </div>
+            <div class="case-hero__row">
+              <span class="meta">Role</span>
+              <span>Architecture, backend, both clients</span>
+            </div>
+            <a class="button" href={atlas.repo} target="_blank" rel="noopener noreferrer" data-magnetic="0.3">
+              <span>Repository</span>
+              <ArrowUpRight size={16} strokeWidth={1.9} />
+            </a>
+          </div>
+        </div>
+
+        <dl class="case-stats" data-reveal-group>
+          {atlas.stats.map((stat) => (
+            <div class="case-stat">
+              <dd data-count={stat.count}>{stat.value}</dd>
+              <dt class="meta">{stat.label}</dt>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- ═══ 02 · thesis ════════════════════════════════════════════════ -->
+    <section class="section section--surface" id="thesis" aria-labelledby="thesis-title">
+      <div class="container">
+        <p class="eyebrow">The thesis</p>
+        <blockquote class="case-quote">
+          <p id="thesis-title">{atlas.thesis.quote}</p>
+          <cite class="meta">{atlas.thesis.source}</cite>
+        </blockquote>
+        <p class="case-gloss">{atlas.thesis.gloss}</p>
+      </div>
+    </section>
+
+    <!-- ═══ 03 · the rewrite (horizontal track) ════════════════════════ -->
+    <section class="track" id="rewrite" aria-labelledby="rewrite-title" data-track>
+      <div class="track__inner" data-track-inner>
+        <header class="track__head">
+          <p class="eyebrow">The rewrite</p>
+          <h2 class="track__title" id="rewrite-title">
+            Atlas was rebuilt from the boundary inwards.
+          </h2>
+          <p class="track__note">
+            Three moves over seven months. The middle one is the one that mattered.
+          </p>
+        </header>
+
+        {atlas.arc.map((step, index) => (
+          <article class="phase">
+            <div class="phase__top">
+              <span class="meta phase__num">{String(index + 1).padStart(2, "0")}</span>
+              <span class="tag tag--accent">{step.phase}</span>
+            </div>
+            <p class="meta phase__period">{step.period}</p>
+            <h3 class="phase__title">{step.title}</h3>
+            <p class="phase__body">{step.body}</p>
+            <p class="phase__marker">{step.marker}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- ═══ 04 · architecture ══════════════════════════════════════════ -->
+    <section class="section" id="architecture" aria-labelledby="architecture-title">
+      <div class="container--wide">
+        <SectionHeading
+          eyebrow="Architecture"
+          title="One control plane, two directions of travel."
+          body="The host never imports an agent. It spawns one, speaks a fixed contract to it, and relays what comes back. That single constraint is what lets an agent be written in any language and unplugged without touching the backend."
+          titleId="architecture-title"
+        />
+
+        <div class="arch">
+          <div class="arch__stage">
+            <AtlasDiagram />
+          </div>
+
+          <div class="arch__planes">
+            {atlas.planes.map((plane) => (
+              <article class="plane" data-reveal>
+                <h3 class="plane__name">{plane.name}</h3>
+                <p class="meta plane__dir">{plane.direction} · {plane.transport}</p>
+                <p class="plane__body">{plane.body}</p>
+                <ul class="plane__events">
+                  {plane.events.map((event) => <li class="tag">{event}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 05 · clients ═══════════════════════════════════════════════ -->
+    <section class="section section--surface" id="clients" aria-labelledby="clients-title">
+      <div class="container--wide">
+        <SectionHeading
+          eyebrow="Three surfaces"
+          title="One contract, written three times over."
+          body="Each client was built against the frozen HTTP contract rather than against the backend's implementation — which is why the mobile app kept working through the entire Python-to-Go replacement."
+          titleId="clients-title"
+        />
+
+        <div class="clients" data-reveal-group>
+          {atlas.clients.map((client, index) => (
+            <article class="client">
+              <span class="meta client__num">{String(index + 1).padStart(2, "0")}</span>
+              <h3 class="client__name">{client.name}</h3>
+              <p class="meta client__role">{client.role}</p>
+              <p class="client__stack">{client.stack}</p>
+              <p class="client__scale">{client.scale}</p>
+              <p class="client__body">{client.body}</p>
+              <p class="client__highlight">{client.highlight}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 06 · decisions ═════════════════════════════════════════════ -->
+    <section class="section" id="decisions" aria-labelledby="decisions-title">
+      <div class="container--wide">
+        <SectionHeading
+          eyebrow="Decisions"
+          title="The four constraints everything else follows from."
+          titleId="decisions-title"
+        />
+
+        <ol class="decisions">
+          {atlas.decisions.map((decision, index) => (
+            <li class="decision" data-reveal>
+              <span class="meta decision__num">{String(index + 1).padStart(2, "0")}</span>
+              <div class="decision__body">
+                <h3>{decision.title}</h3>
+                <p>{decision.body}</p>
+                <code class="decision__evidence">{decision.evidence}</code>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- ═══ 07 · status ════════════════════════════════════════════════ -->
+    <section class="section section--surface" id="status" aria-labelledby="status-title">
+      <div class="container--wide">
+        <SectionHeading
+          eyebrow="Where it stands"
+          title="Shipped, and honestly unfinished."
+          titleId="status-title"
+        />
+
+        <div class="status">
+          <div class="status__col">
+            <h3 class="meta status__label status__label--done">Done</h3>
+            <ul>
+              {atlas.status.shipped.map((item) => (
+                <li>
+                  <Check size={15} strokeWidth={2} aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="status__col">
+            <h3 class="meta status__label">Still owed</h3>
+            <ul>
+              {atlas.status.outstanding.map((item) => (
+                <li>
+                  <Circle size={15} strokeWidth={2} aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p class="status__caveat">{atlas.status.caveat}</p>
+
+        <div class="status__foot">
+          <div class="tag-row">
+            {atlas.stack.map((item) => <span class="tag">{item}</span>)}
+          </div>
+          <a class="button button--primary" href={atlas.repo} target="_blank" rel="noopener noreferrer" data-magnetic="0.3">
+            <span>Read the source</span>
+            <ArrowUpRight size={16} strokeWidth={1.9} />
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  /* ── 01 hero ──────────────────────────────────────────────────────── */
+  .case-hero {
+    position: relative;
+    padding-block: var(--space-11) var(--section-y);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .case-hero__wash {
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    z-index: -1;
+    width: min(140vw, 1700px);
+    aspect-ratio: 2 / 1;
+    background: radial-gradient(ellipse at center, rgba(74, 158, 224, 0.2) 0%, transparent 64%);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .case-hero__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .case-hero__back {
+    justify-self: start;
+    color: var(--text-soft);
+  }
+
+  .case-hero__head {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .case-hero__tagline {
+    max-width: 24ch;
+    font-size: var(--step-3);
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+  }
+
+  .case-hero__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    gap: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .case-hero__intro {
+    max-width: 62ch;
+    font-size: var(--step-1);
+    color: var(--text-soft);
+  }
+
+  .case-hero__side {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    justify-items: start;
+  }
+
+  .case-hero__row {
+    display: grid;
+    gap: 2px;
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .case-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .case-stat dd {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── 02 thesis ────────────────────────────────────────────────────── */
+  .case-quote {
+    max-width: 32ch;
+    margin: var(--space-6) 0 var(--space-6);
+    padding-left: var(--space-6);
+    border-left: 2px solid var(--accent);
+  }
+
+  .case-quote p {
+    font-size: var(--step-3);
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+
+  .case-quote cite {
+    display: block;
+    margin-top: var(--space-4);
+    font-style: normal;
+  }
+
+  .case-gloss {
+    max-width: 64ch;
+    font-size: var(--step-1);
+    color: var(--text-soft);
+  }
+
+  /* ── 03 horizontal track ──────────────────────────────────────────── */
+  .track {
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+
+  .track__inner {
+    display: flex;
+    gap: var(--space-6);
+    align-items: stretch;
+    padding-inline: var(--gutter);
+    will-change: transform;
+  }
+
+  .track__head {
+    display: grid;
+    align-content: center;
+    gap: var(--space-4);
+    flex: 0 0 clamp(20rem, 34vw, 30rem);
+    padding-right: var(--space-6);
+    border-right: 1px solid var(--line);
+  }
+
+  .track__title {
+    font-size: var(--step-4);
+    letter-spacing: -0.025em;
+  }
+
+  .track__note {
+    max-width: 34ch;
+    color: var(--text-soft);
+  }
+
+  .phase {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    flex: 0 0 clamp(19rem, 27vw, 25rem);
+    padding: var(--space-6);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+
+  .phase__top {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .phase__num {
+    color: var(--text-mute);
+  }
+
+  .phase__period {
+    color: var(--text-mute);
+  }
+
+  .phase__title {
+    font-size: var(--step-2);
+    letter-spacing: -0.015em;
+  }
+
+  .phase__body {
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .phase__marker {
+    margin-top: auto;
+    padding-top: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border-top: 1px solid var(--line);
+  }
+
+  /* ── 04 architecture ──────────────────────────────────────────────── */
+  .arch {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.75fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  /* Sticky rather than a ScrollTrigger pin: the diagram simply needs to stay
+     put while the two plane descriptions scroll past it, and `position: sticky`
+     does that natively, with no pin-spacer and no layout surprises. Lenis
+     preserves native scrolling, so sticky keeps working under smooth scroll. */
+  .arch__stage {
+    position: sticky;
+    top: 120px;
+    overflow-x: auto;
+    padding-bottom: var(--space-4);
+  }
+
+  .arch__planes {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .plane {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+
+  .plane__name {
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+  }
+
+  .plane__dir {
+    color: var(--accent);
+  }
+
+  .plane__body {
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .plane__events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* ── 05 clients ───────────────────────────────────────────────────── */
+  .clients {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .client {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    background: var(--void);
+  }
+
+  .client__num {
+    color: var(--text-mute);
+  }
+
+  .client__name {
+    font-family: var(--font-mono);
+    font-size: var(--step-1);
+    color: var(--accent);
+  }
+
+  .client__role {
+    color: var(--text-soft);
+  }
+
+  .client__stack {
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+  }
+
+  .client__scale {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-mute);
+  }
+
+  .client__body {
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .client__highlight {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    font-size: var(--step--1);
+    color: var(--text);
+    border-top: 1px solid var(--line);
+  }
+
+  /* ── 06 decisions ─────────────────────────────────────────────────── */
+  .decisions {
+    border-top: 1px solid var(--line);
+  }
+
+  .decision {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .decision__num {
+    color: var(--text-mute);
+  }
+
+  .decision__body {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 68ch;
+  }
+
+  .decision__body h3 {
+    font-size: var(--step-2);
+    letter-spacing: -0.015em;
+  }
+
+  .decision__body p {
+    color: var(--text-soft);
+  }
+
+  .decision__evidence {
+    justify-self: start;
+    padding: 0.28rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--accent);
+    background: var(--accent-dim);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── 07 status ────────────────────────────────────────────────────── */
+  .status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .status__col ul {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .status__col li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+
+  .status__col li :global(svg) {
+    margin-top: 0.28em;
+    color: var(--text-mute);
+  }
+
+  .status__label {
+    color: var(--text-soft);
+  }
+
+  .status__label--done {
+    color: var(--signal);
+  }
+
+  .status__col:first-child li :global(svg) {
+    color: var(--signal);
+  }
+
+  .status__caveat {
+    max-width: 64ch;
+    margin-top: var(--space-6);
+    font-size: var(--step-1);
+    color: var(--text-soft);
+  }
+
+  .status__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--line);
+  }
+
+  /* ── responsive ───────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    /* No pinning below this width, so the track becomes a normal band with a
+       thumb-scrollable rail rather than a viewport-height pin. */
+    .track {
+      height: auto;
+      padding-block: var(--section-y);
+      overflow: visible;
+    }
+
+    .track__inner {
+      overflow-x: auto;
+      padding-bottom: var(--space-4);
+      scroll-snap-type: x mandatory;
+    }
+
+    .track__head,
+    .phase {
+      scroll-snap-align: start;
+    }
+
+    .arch {
+      grid-template-columns: 1fr;
+      gap: var(--space-7);
+    }
+
+    .arch__stage {
+      position: static;
+    }
+
+    .clients {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .case-hero__body,
+    .status {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    .case-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .case-hero__mark {
+      display: none;
+    }
+
+    .track__head {
+      flex-basis: 18rem;
+      border-right: 0;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .decision {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+  }
+</style>

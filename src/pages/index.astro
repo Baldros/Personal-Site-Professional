@@ -1,95 +1,109 @@
 ---
-import ApiStrategy from "../components/ApiStrategy.astro";
-import ArchitectureStrip from "../components/ArchitectureStrip.astro";
 import CapabilityMap from "../components/CapabilityMap.astro";
 import ContactBand from "../components/ContactBand.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
+import FeaturedProject from "../components/FeaturedProject.astro";
 import Hero from "../components/Hero.astro";
 import Layout from "../components/Layout.astro";
-import ProjectShowcase from "../components/ProjectShowcase.astro";
+import ProjectIndex from "../components/ProjectIndex.astro";
 import SectionHeading from "../components/SectionHeading.astro";
-import ValueFlow from "../components/ValueFlow.astro";
 import { profile } from "../data/profile";
+
+const dots = [
+  { id: "top", label: "Top" },
+  { id: "work", label: "Work" },
+  { id: "capabilities", label: "Capabilities" },
+  { id: "experience", label: "Experience" },
+  { id: "contact", label: "Contact" }
+];
 ---
 
-<Layout>
+<Layout dots={dots}>
   <Hero />
 
   <main id="main">
-    <section class="section section--paper section--capabilities" id="expertise">
-      <div class="container">
+    <FeaturedProject />
+
+    <section class="section" aria-labelledby="archive-title">
+      <div class="container--wide">
+        <div class="section-heading">
+          <p class="eyebrow">Also built</p>
+          <h2 id="archive-title" data-split>
+            Agents, retrieval systems and the tooling that makes them usable.
+          </h2>
+        </div>
+        <ProjectIndex />
+      </div>
+    </section>
+
+    <section class="section section--surface" id="capabilities" aria-labelledby="capabilities-title">
+      <div class="container--wide">
         <SectionHeading
-          eyebrow="Capabilities and offers"
-          title="Applied AI, automation, and scientific computing in one operating range."
-          body="A portfolio layout should make the technical range legible fast: what can be built, where the evidence comes from, and how the work maps to real systems."
+          eyebrow="Capabilities"
+          title="Applied AI, automation and scientific computing in one operating range."
+          body="The through-line is turning model reasoning into a concrete operating surface: retrieval, automation, internal tools and domain-specific assistants."
+          titleId="capabilities-title"
         />
-        <div class="metric-row" aria-label="Profile metrics" data-reveal>
+
+        <dl class="metrics" data-reveal-group>
           {profile.metrics.map((metric) => (
             <div class="metric">
-              <strong>{metric.value}</strong>
-              <span>{metric.label}</span>
+              <dd data-count={Number(metric.value.replace(/\D/g, "")) || undefined}>
+                {metric.value}
+              </dd>
+              <dt class="meta">{metric.label}</dt>
             </div>
           ))}
-        </div>
+        </dl>
+
         <CapabilityMap />
       </div>
     </section>
 
-    <section class="section section--value" id="value">
-      <div class="container">
-        <SectionHeading
-          eyebrow="Value proposition"
-          title="From raw context to useful engineering decisions."
-          body="The work is strongest when it connects model reasoning to a concrete operating surface: retrieval, automation, dashboards, internal tools, and domain-specific assistants."
-        />
-        <ValueFlow />
-      </div>
-    </section>
-
-    <section class="section section--story" id="experience">
-      <div class="container">
+    <section class="section" id="experience" aria-labelledby="experience-title">
+      <div class="container--wide">
         <SectionHeading
           eyebrow="Experience"
-          title="A career arc from environmental intelligence to agentic business systems."
-          body="The common thread is turning technical systems into usable intelligence: research data, engineering simulations, corporate workflows, and AI assistants."
+          title="From environmental intelligence to agentic business systems."
+          body="The common thread is turning technical systems into usable intelligence: research data, engineering simulations, corporate workflows and AI assistants."
+          titleId="experience-title"
         />
         <ExperienceTimeline />
-      </div>
-    </section>
-
-    <section class="section section--warm section--projects" id="projects">
-      <div class="container">
-        <SectionHeading
-          eyebrow="Selected Work"
-          title="Projects that show the direction of the portfolio."
-          body="The GitHub profile is strongest when it is framed as an applied AI laboratory: agents, retrieval systems, CLI tools, and domain-specific assistants."
-        />
-        <ProjectShowcase />
-      </div>
-    </section>
-
-    <section class="section section--workflow" id="architecture">
-      <div class="container">
-        <SectionHeading
-          eyebrow="Methods and workflows"
-          title="A portfolio architecture ready for richer agent interaction."
-          body="Like the reference layout, this section turns architecture into a visible system: content, interface, official API layer, and evidence registry."
-        />
-        <ArchitectureStrip />
-      </div>
-    </section>
-
-    <section class="section section--paper" id="apis">
-      <div class="container">
-        <SectionHeading
-          eyebrow="Official APIs"
-          title="A practical integration roadmap for LinkedIn, TikTok, and X."
-          body="The API plan uses official platform capabilities only. LinkedIn is the best first step, TikTok can support media proof, and X should stay behind explicit spend limits."
-        />
-        <ApiStrategy />
       </div>
     </section>
   </main>
 
   <ContactBand />
 </Layout>
+
+<style>
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0 0 var(--space-8);
+    padding-block: var(--space-6);
+    border-block: 1px solid var(--line);
+  }
+
+  .metric {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .metric dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 720px) {
+    .metrics {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+  }
+</style>

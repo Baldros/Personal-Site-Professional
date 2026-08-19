@@ -1,0 +1,263 @@
+---
+/**
+ * The Atlas topology: clients over HTTP/SSE, the hollow broker in the middle,
+ * and the agent fleet behind a two-plane ABI.
+ *
+ * Drawn as inline SVG rather than shipped as an image so it inherits the page
+ * tokens, scales without artefacts, and keeps its text selectable and
+ * crawlable. The Atlas repository contains no product screenshots at all, so
+ * every visual on this page is either this diagram or the real logo mark.
+ */
+---
+
+<figure class="diagram">
+  <svg
+    viewBox="0 0 920 470"
+    role="img"
+    aria-labelledby="diagram-title diagram-desc"
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <title id="diagram-title">Atlas control-plane topology</title>
+    <desc id="diagram-desc">
+      Two clients — an Electron desktop shell and a Flutter mobile client — reach the
+      atlasd broker over HTTP and server-sent events on loopback. The broker holds a
+      gateway, agent registry, scheduler, SQLite store and SSE relay, and explicitly no
+      model code. It talks to a supervisor agent and a crew of specialist agents across
+      the agentd contract: a forward plane carrying invoke calls and NDJSON event
+      streams, and a reverse plane carrying list_agents and delegate calls back. Only
+      the agents call the language-model providers.
+    </desc>
+
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+      </marker>
+    </defs>
+
+    <!-- ── clients ─────────────────────────────────────────────────────── -->
+    <g class="d-group">
+      <text class="d-axis" x="8" y="86">CLIENTS</text>
+
+      <rect class="d-box" x="8" y="100" width="168" height="72" rx="8" />
+      <text class="d-title" x="26" y="130">Desktop shell</text>
+      <text class="d-meta" x="26" y="152">Electron + React</text>
+
+      <rect class="d-box" x="8" y="196" width="168" height="72" rx="8" />
+      <text class="d-title" x="26" y="226">Mobile client</text>
+      <text class="d-meta" x="26" y="248">Flutter · SSH tunnel</text>
+    </g>
+
+    <!-- ── clients → broker ────────────────────────────────────────────── -->
+    <g class="d-flow">
+      <path class="d-line" d="M 176 136 L 262 136 L 262 184 L 288 184" marker-end="url(#arrow)" />
+      <path class="d-line" d="M 176 232 L 262 232 L 262 184" />
+      <text class="d-edge" x="184" y="124">HTTP + SSE</text>
+      <text class="d-edge d-edge--dim" x="184" y="204">loopback only</text>
+    </g>
+
+    <!-- ── the broker ──────────────────────────────────────────────────── -->
+    <g class="d-group">
+      <rect class="d-box d-box--core" x="290" y="52" width="286" height="366" rx="12" />
+      <text class="d-axis d-axis--accent" x="310" y="84">CONTROL PLANE</text>
+      <text class="d-heading" x="310" y="116">atlasd</text>
+      <text class="d-meta" x="310" y="138">Go · one static binary</text>
+
+      <rect class="d-pill" x="310" y="160" width="118" height="34" rx="6" />
+      <text class="d-pill-text" x="369" y="182">gateway</text>
+
+      <rect class="d-pill" x="438" y="160" width="118" height="34" rx="6" />
+      <text class="d-pill-text" x="497" y="182">registry</text>
+
+      <rect class="d-pill" x="310" y="204" width="118" height="34" rx="6" />
+      <text class="d-pill-text" x="369" y="226">scheduler</text>
+
+      <rect class="d-pill" x="438" y="204" width="118" height="34" rx="6" />
+      <text class="d-pill-text" x="497" y="226">SQLite</text>
+
+      <rect class="d-pill" x="310" y="248" width="246" height="34" rx="6" />
+      <text class="d-pill-text" x="433" y="270">SSE relay</text>
+
+      <!-- The hollow centre is the whole argument, so it is drawn as an
+           absence: a dashed void where the model code would otherwise be. -->
+      <rect class="d-void" x="310" y="304" width="246" height="86" rx="8" />
+      <text class="d-void-text" x="433" y="338">no in-process</text>
+      <text class="d-void-text" x="433" y="360">model code</text>
+    </g>
+
+    <!-- ── the agentd contract ─────────────────────────────────────────── -->
+    <g class="d-flow">
+      <text class="d-axis d-axis--accent" x="600" y="86">agentd ABI</text>
+
+      <path class="d-line d-line--forward" d="M 576 148 L 700 148" marker-end="url(#arrow)" />
+      <text class="d-edge" x="586" y="138">invoke</text>
+      <text class="d-edge d-edge--dim" x="586" y="170">NDJSON events</text>
+
+      <path class="d-line d-line--reverse" d="M 700 268 L 576 268" marker-end="url(#arrow)" />
+      <text class="d-edge" x="586" y="258">delegate</text>
+      <text class="d-edge d-edge--dim" x="586" y="290">list_agents</text>
+    </g>
+
+    <!-- ── agents ──────────────────────────────────────────────────────── -->
+    <g class="d-group">
+      <text class="d-axis" x="712" y="86">AGENTS</text>
+
+      <rect class="d-box d-box--agent" x="712" y="100" width="200" height="80" rx="8" />
+      <text class="d-title" x="730" y="132">Supervisor</text>
+      <text class="d-meta" x="730" y="154">plans and delegates</text>
+
+      <rect class="d-box d-box--agent" x="712" y="228" width="200" height="80" rx="8" />
+      <text class="d-title" x="730" y="260">Crew</text>
+      <text class="d-meta" x="730" y="282">web · files · Google · OS</text>
+
+      <path class="d-line" d="M 812 180 L 812 228" marker-end="url(#arrow)" />
+      <path class="d-line" d="M 812 308 L 812 346" marker-end="url(#arrow)" />
+
+      <rect class="d-box" x="712" y="346" width="200" height="80" rx="8" />
+      <text class="d-title" x="730" y="374">LLM providers</text>
+      <text class="d-meta" x="730" y="394">OpenAI · Anthropic · Gemini</text>
+      <text class="d-meta" x="730" y="410">xAI · Ollama</text>
+    </g>
+  </svg>
+
+  <figcaption class="meta">
+    The broker validates and governs the boundary; the agents interpret and execute
+    the task.
+  </figcaption>
+</figure>
+
+<style>
+  .diagram {
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* The diagram is wide by nature. Rather than shrink it into illegibility on a
+     phone, it scrolls inside its own container — the page body never scrolls
+     horizontally. */
+  .diagram svg {
+    width: 100%;
+    min-width: 640px;
+    height: auto;
+    color: var(--text-mute);
+  }
+
+  .diagram > svg {
+    overflow: visible;
+  }
+
+  .diagram figcaption {
+    max-width: 52ch;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--text-mute);
+  }
+
+  .d-box {
+    fill: var(--surface-2);
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+
+  .d-box--core {
+    fill: rgba(74, 158, 224, 0.04);
+    stroke: var(--line-accent);
+  }
+
+  .d-box--agent {
+    fill: var(--surface);
+  }
+
+  .d-pill {
+    fill: var(--surface-3);
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .d-void {
+    fill: none;
+    stroke: var(--line-accent);
+    stroke-width: 1;
+    stroke-dasharray: 5 5;
+  }
+
+  .d-line {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1.25;
+    color: var(--line-strong);
+  }
+
+  .d-line--forward {
+    stroke: var(--accent);
+    color: var(--accent);
+  }
+
+  .d-line--reverse {
+    stroke: var(--signal);
+    color: var(--signal);
+    stroke-dasharray: 4 4;
+  }
+
+  .d-axis,
+  .d-edge,
+  .d-meta,
+  .d-pill-text {
+    font-family: var(--font-mono);
+  }
+
+  .d-axis {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    fill: var(--text-mute);
+  }
+
+  .d-axis--accent {
+    fill: var(--accent);
+  }
+
+  .d-heading {
+    font-family: var(--font-display);
+    font-size: 30px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    fill: var(--text);
+  }
+
+  .d-title {
+    font-family: var(--font-body);
+    font-size: 15px;
+    fill: var(--text);
+  }
+
+  .d-meta {
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    fill: var(--text-mute);
+  }
+
+  .d-edge {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    fill: var(--text-soft);
+  }
+
+  .d-edge--dim {
+    fill: var(--text-mute);
+  }
+
+  .d-pill-text {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-anchor: middle;
+    fill: var(--text-soft);
+  }
+
+  .d-void-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-anchor: middle;
+    fill: var(--accent);
+  }
+</style>

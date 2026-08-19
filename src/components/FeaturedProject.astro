@@ -1,0 +1,202 @@
+---
+import { ArrowUpRight } from "lucide-astro";
+import AtlasMark from "./AtlasMark.astro";
+import { atlas } from "../data/atlas";
+import { featuredProject } from "../data/projects";
+---
+
+{featuredProject && (
+  <section class="featured" id="work" aria-labelledby="featured-title" data-parallax-scope>
+    <div class="featured__wash" aria-hidden="true" data-parallax="0.22"></div>
+
+    <div class="container--wide featured__inner">
+      <div class="featured__top">
+        <p class="eyebrow">Selected work — 01</p>
+        <p class="meta featured__status">{featuredProject.status}</p>
+      </div>
+
+      <a class="featured__headline" href={featuredProject.internalHref} data-magnetic="0.12">
+        <span class="featured__mark" aria-hidden="true">
+          <AtlasMark size={92} />
+        </span>
+        <h2 class="display display--sm text-gradient" id="featured-title">Atlas</h2>
+        <span class="featured__go" aria-hidden="true">
+          <ArrowUpRight size={22} strokeWidth={1.6} />
+        </span>
+      </a>
+
+      <div class="featured__body">
+        <p class="featured__lead" data-split>{atlas.tagline}</p>
+        <p class="featured__copy">{featuredProject.body}</p>
+      </div>
+
+      <dl class="featured__stats" data-reveal-group>
+        {atlas.stats.map((stat) => (
+          <div class="featured__stat">
+            <dt class="meta">{stat.label}</dt>
+            <dd data-count={stat.count}>{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="featured__foot">
+        <div class="tag-row">
+          {featuredProject.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+        <a class="button button--primary" href={featuredProject.internalHref} data-magnetic="0.3">
+          <span>Read the case study</span>
+          <ArrowUpRight size={16} strokeWidth={1.9} />
+        </a>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .featured {
+    position: relative;
+    padding-block: var(--section-y);
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    isolation: isolate;
+  }
+
+  .featured__wash {
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    z-index: -1;
+    width: min(140vw, 1700px);
+    aspect-ratio: 3 / 2;
+    background: radial-gradient(
+      ellipse at 50% 40%,
+      rgba(74, 158, 224, 0.16) 0%,
+      transparent 62%
+    );
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .featured__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .featured__top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .featured__status {
+    color: var(--signal);
+  }
+
+  .featured__headline {
+    display: flex;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .featured__mark {
+    flex-shrink: 0;
+  }
+
+  .featured__go {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-left: auto;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition:
+      background var(--dur-2) var(--ease-out),
+      color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out);
+  }
+
+  .featured__headline:hover .featured__go {
+    color: var(--text-invert);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .featured__body {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .featured__lead {
+    max-width: 22ch;
+    font-size: var(--step-3);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+
+  .featured__copy {
+    max-width: 58ch;
+    color: var(--text-soft);
+  }
+
+  .featured__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .featured__stat dt {
+    margin-bottom: var(--space-2);
+  }
+
+  .featured__stat dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .featured__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 900px) {
+    .featured__body,
+    .featured__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .featured__go {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .featured__body {
+      grid-template-columns: 1fr;
+    }
+
+    .featured__mark {
+      display: none;
+    }
+  }
+</style>

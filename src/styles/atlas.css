@@ -1,170 +1,173 @@
+/* =============================================================================
+   Atlas dock — the React island in src/components/AtlasDock.tsx
+   -----------------------------------------------------------------------------
+   Kept in a global stylesheet rather than a scoped block because the island is
+   a .tsx component and Astro's scoped styles do not reach into it.
+   ========================================================================== */
+
 .atlas {
   position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 40;
-  color: var(--ink);
+  right: var(--gutter);
+  bottom: var(--gutter);
+  z-index: var(--z-dock);
+  display: grid;
+  justify-items: end;
+  gap: var(--space-3);
 }
 
 .atlas__launcher {
   display: grid;
-  width: 52px;
-  height: 52px;
   place-items: center;
-  color: #f8fbf8;
-  border: 1px solid rgba(248, 251, 248, 0.24);
+  width: 54px;
+  height: 54px;
+  color: var(--text-invert);
+  background: var(--accent-gradient);
+  border: 0;
   border-radius: 50%;
-  background: #103b3e;
-  box-shadow: 0 14px 36px rgba(18, 20, 23, 0.22);
+  box-shadow: var(--shadow), var(--shadow-glow);
+  transition: transform var(--dur-2) var(--ease-spring);
 }
 
 .atlas__launcher:hover {
-  background: #0b3032;
+  transform: scale(1.07);
 }
 
 .atlas__panel {
-  position: absolute;
-  right: 0;
-  bottom: 64px;
   display: grid;
-  width: min(390px, calc(100vw - 28px));
-  max-height: min(690px, calc(100vh - 110px));
-  grid-template-rows: auto minmax(210px, 1fr) auto auto;
+  grid-template-rows: auto 1fr auto auto;
+  width: min(92vw, 380px);
+  max-height: min(70vh, 560px);
   overflow: hidden;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 24px 70px rgba(18, 20, 23, 0.18);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .atlas__header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  background: var(--surface-deep);
-}
-
-.atlas__header span {
-  display: inline-flex;
+  gap: var(--space-3);
   align-items: center;
-  gap: 7px;
-  color: var(--ink);
-  font-weight: 800;
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  border-bottom: 1px solid var(--line);
 }
 
-.atlas__header p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-.atlas__header button,
-.atlas__form button {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 auto;
-  place-items: center;
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface);
+.atlas__header svg {
+  color: var(--accent);
 }
 
 .atlas__messages {
-  display: flex;
-  min-height: 220px;
-  flex-direction: column;
-  gap: 10px;
-  overflow: auto;
-  padding: 14px;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  overflow-y: auto;
+  font-size: var(--step--1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 .atlas__message {
-  width: fit-content;
-  max-width: 92%;
-  margin: 0;
-  padding: 10px 11px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 0.92rem;
-  line-height: 1.45;
-}
-
-.atlas__message--user {
-  align-self: flex-end;
-  color: #ffffff;
-  border-color: #006a73;
-  background: var(--mineral);
+  max-width: 88%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  line-height: 1.55;
 }
 
 .atlas__message--atlas {
-  align-self: flex-start;
-  background: #eef3ec;
+  justify-self: start;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.atlas__message--user {
+  justify-self: end;
+  color: var(--text-invert);
+  background: var(--accent);
 }
 
 .atlas__message-end {
-  min-height: 1px;
+  height: 1px;
 }
 
 .atlas__prompts {
-  display: grid;
-  gap: 6px;
-  padding: 0 14px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-5) var(--space-4);
 }
 
 .atlas__prompts button {
-  min-height: 34px;
-  padding: 7px 9px;
-  color: var(--ink-soft);
-  text-align: left;
+  padding: 0.34rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--text-soft);
+  background: transparent;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.78);
-  font-size: 0.84rem;
+  border-radius: 100px;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
 }
 
 .atlas__prompts button:hover {
-  border-color: var(--line-strong);
-  background: var(--surface-deep);
+  color: var(--accent);
+  border-color: var(--line-accent);
 }
 
 .atlas__form {
   display: grid;
-  grid-template-columns: 1fr 38px;
-  gap: 8px;
-  padding: 14px;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5) var(--space-5);
   border-top: 1px solid var(--line);
-  background: var(--surface-deep);
 }
 
 .atlas__form input {
-  width: 100%;
-  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  font-size: var(--step--1);
+  background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 9px 10px;
-  color: var(--ink);
-  background: var(--surface);
+  border-radius: var(--radius);
 }
 
-.atlas__form button:disabled,
-.atlas__prompts button:disabled {
+.atlas__form input::placeholder {
+  color: var(--text-mute);
+}
+
+.atlas__form input:focus-visible {
+  border-color: var(--line-accent);
+}
+
+.atlas__form button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  color: var(--text-invert);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius);
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+
+.atlas__form button:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.4;
 }
 
 @media (max-width: 680px) {
   .atlas {
-    right: 14px;
-    bottom: 14px;
+    right: var(--space-4);
+    bottom: var(--space-4);
   }
 
   .atlas__panel {
-    bottom: 62px;
-    max-height: calc(100svh - 96px);
+    width: calc(100vw - (var(--space-4) * 2));
+    max-height: 62vh;
   }
 }

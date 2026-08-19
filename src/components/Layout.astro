@@ -1,94 +1,95 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import AtlasDock from "./AtlasDock";
 import Navigation from "./Navigation.astro";
 import SectionDots from "./SectionDots.astro";
 import { profile } from "../data/profile";
+import "../styles/tokens.css";
 import "../styles/global.css";
+import "../styles/motion.css";
 import "../styles/atlas.css";
+
+type NavTarget = { label: string; href: string };
 
 type Props = {
   title?: string;
   description?: string;
   image?: string;
+  navTargets?: NavTarget[];
+  dots?: { id: string; label: string }[];
 };
 
 const {
-  title = `${profile.name} | Software & AI Engineer`,
-  description = `${profile.name} is a software and AI engineer focused on agentic systems, automation, data science, and engineering workflows.`,
-  image = profile.avatarUrl
+  title = `${profile.name} — Software & AI Engineer`,
+  description = `${profile.name} designs intelligent software systems: AI agents, automation, data science and engineering workflows.`,
+  image = profile.avatarUrl,
+  navTargets,
+  dots
 } = Astro.props;
 
-const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
+const canonicalUrl = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : undefined;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="author" content={profile.name} />
     <meta name="robots" content="index, follow" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111716" />
+    <meta name="theme-color" content="#08090b" />
+    <meta name="color-scheme" content="dark" />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%234a9ee0' stroke-width='8'/%3E%3C/svg%3E"
+    />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={`${profile.name} Portfolio`} />
+    <meta property="og:site_name" content={`${profile.name} — Portfolio`} />
     <meta property="og:image" content={image} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <title>{title}</title>
+    <ClientRouter />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Navigation />
+
+    <div class="scroll-rail" aria-hidden="true">
+      <div class="scroll-rail__fill"></div>
+    </div>
+
+    <Navigation targets={navTargets} />
+
     <slot />
-    <SectionDots />
+
+    {dots && <SectionDots items={dots} />}
+
     <footer class="footer">
       <div class="container footer__inner">
-        <p>André Amorim</p>
-        <p>Software, AI agents, automation, and scientific computing.</p>
+        <p><strong>{profile.name}</strong> — {profile.role}</p>
+        <p>{profile.philosophy}</p>
       </div>
     </footer>
+
+    <div class="grain" aria-hidden="true"></div>
+
     <AtlasDock client:idle />
+
     <script>
-      const revealElements = Array.from(document.querySelectorAll("[data-reveal]")) as HTMLElement[];
+      import { destroyMotion, initMotion } from "../lib/motion";
 
-      if (revealElements.length) {
-        document.documentElement.classList.add("reveal-ready");
-
-        const reveal = (element: HTMLElement) => {
-          const delay = Number(element.dataset.revealDelay || 0);
-
-          if (delay > 0 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            window.setTimeout(() => element.classList.add("is-revealed"), delay);
-            return;
-          }
-
-          element.classList.add("is-revealed");
-        };
-
-        if ("IntersectionObserver" in window) {
-          const observer = new IntersectionObserver(
-            (entries) => {
-              entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-
-                reveal(entry.target as HTMLElement);
-                observer.unobserve(entry.target);
-              });
-            },
-            { rootMargin: "0px 0px -12% 0px", threshold: 0.14 }
-          );
-
-          revealElements.forEach((element) => observer.observe(element));
-        } else {
-          revealElements.forEach(reveal);
-        }
-      }
+      // Re-run after every view transition; `astro:page-load` fires on the
+      // initial load too, so this single listener covers both cases.
+      document.addEventListener("astro:page-load", initMotion);
+      document.addEventListener("astro:before-swap", destroyMotion);
     </script>
   </body>
 </html>

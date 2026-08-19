@@ -1,48 +1,124 @@
 ---
-const items = [
-  { label: "Home", href: "#top", target: "top" },
-  { label: "Capabilities", href: "#expertise", target: "expertise" },
-  { label: "Value", href: "#value", target: "value" },
-  { label: "Experience", href: "#experience", target: "experience" },
-  { label: "Projects", href: "#projects", target: "projects" },
-  { label: "Architecture", href: "#architecture", target: "architecture" },
-  { label: "APIs", href: "#apis", target: "apis" },
-  { label: "Contact", href: "#contact", target: "contact" }
-];
+type DotItem = { id: string; label: string };
+
+type Props = { items: DotItem[] };
+
+const { items } = Astro.props;
 ---
 
-<nav class="section-dots" aria-label="Page section navigation">
+<nav class="section-dots" aria-label="Section navigation" data-dots>
   {items.map((item) => (
-    <div class="section-dots__item">
-      <span>{item.label}</span>
-      <a class="section-dots__dot" href={item.href} aria-label={item.label} data-section-dot={item.target}></a>
-    </div>
+    <a class="section-dots__item" href={`#${item.id}`} data-dot={item.id}>
+      <span class="section-dots__label">{item.label}</span>
+      <span class="section-dots__dot" aria-hidden="true"></span>
+      <span class="sr-only">{item.label}</span>
+    </a>
   ))}
 </nav>
 
-<script>
-  const dots = Array.from(document.querySelectorAll("[data-section-dot]")) as HTMLAnchorElement[];
-  const sections = dots
-    .map((dot) => {
-      const id = dot.dataset.sectionDot;
-      return id ? { dot, section: document.getElementById(id) } : null;
-    })
-    .filter((item): item is { dot: HTMLAnchorElement; section: HTMLElement } => Boolean(item?.section));
+<style>
+  .section-dots {
+    position: fixed;
+    top: 50%;
+    right: var(--gutter);
+    z-index: var(--z-dots);
+    display: grid;
+    gap: var(--space-4);
+    transform: translateY(-50%);
+  }
 
-  if (sections.length && "IntersectionObserver" in window) {
+  .section-dots__item {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .section-dots__label {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    opacity: 0;
+    transform: translateX(6px);
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
+  }
+
+  .section-dots__item:hover .section-dots__label,
+  .section-dots__item:focus-visible .section-dots__label,
+  .section-dots__item.is-active .section-dots__label {
+    opacity: 1;
+    transform: none;
+  }
+
+  .section-dots__dot {
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition:
+      background var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
+  }
+
+  .section-dots__item.is-active .section-dots__dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.35);
+    box-shadow: 0 0 10px rgba(74, 158, 224, 0.7);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1100px) {
+    .section-dots {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const setupDots = () => {
+    const dots = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-dot]"));
+    if (!dots.length) return;
+
+    const sections = dots
+      .map((dot) => document.getElementById(dot.dataset.dot ?? ""))
+      .filter((section): section is HTMLElement => Boolean(section));
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-
-          dots.forEach((dot) => dot.classList.remove("is-active"));
-          const active = dots.find((dot) => dot.dataset.sectionDot === entry.target.id);
-          active?.classList.add("is-active");
+          dots.forEach((dot) =>
+            dot.classList.toggle("is-active", dot.dataset.dot === entry.target.id)
+          );
         });
       },
-      { rootMargin: "-38% 0px -52% 0px", threshold: 0.01 }
+      // A narrow band across the middle of the viewport, so exactly one section
+      // is ever "current" regardless of how tall the sections are.
+      { rootMargin: "-45% 0px -50% 0px" }
     );
 
-    sections.forEach(({ section }) => observer.observe(section));
-  }
+    sections.forEach((section) => observer.observe(section));
+
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), {
+      once: true
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupDots);
 </script>

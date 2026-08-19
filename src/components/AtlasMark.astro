@@ -1,0 +1,86 @@
+---
+/**
+ * The Atlas mark.
+ *
+ * Ported from the product's own logo component
+ * (Atlas-Desktop-Agent/UI-Desktop-Agent/src/renderer/src/app/components/AtlasLogo.tsx):
+ * a static gradient circle with two dashed rings counter-rotating around it.
+ * Geometry and the brand gradient are taken verbatim from the source so the
+ * portfolio shows the real mark rather than an approximation of it.
+ *
+ * The Atlas repository ships no logo raster — the only PNG in it is the stock
+ * electron-vite template icon — so this SVG is the authentic asset.
+ */
+type Props = { size?: number; class?: string };
+
+const { size = 120, class: className = "" } = Astro.props;
+const uid = `atlas-mark-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<svg
+  class:list={["atlas-mark", className]}
+  width={size}
+  height={size}
+  viewBox="0 0 100 100"
+  fill="none"
+  role="img"
+  aria-label="Atlas"
+>
+  <defs>
+    <linearGradient id={uid} x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9ee0" />
+      <stop offset="50%" stop-color="#3b8ed0" />
+      <stop offset="100%" stop-color="#2d6fa3" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="50" cy="50" r="40" stroke={`url(#${uid})`} stroke-width="6" />
+
+  <circle
+    class="atlas-mark__ring atlas-mark__ring--outer"
+    cx="50"
+    cy="50"
+    r="46"
+    stroke="#4a9ee0"
+    stroke-width="3.5"
+    stroke-dasharray="45 27.256"
+    stroke-linecap="round"
+    opacity="0.72"
+  />
+
+  <circle
+    class="atlas-mark__ring atlas-mark__ring--inner"
+    cx="50"
+    cy="50"
+    r="34"
+    stroke="#3b8ed0"
+    stroke-width="2.5"
+    stroke-dasharray="33 20.407"
+    stroke-linecap="round"
+    opacity="0.55"
+  />
+</svg>
+
+<style>
+  .atlas-mark {
+    overflow: visible;
+  }
+
+  .atlas-mark__ring {
+    transform-origin: 50% 50%;
+  }
+
+  .atlas-mark__ring--outer {
+    animation: ring-spin 14s linear infinite;
+  }
+
+  .atlas-mark__ring--inner {
+    animation: ring-spin-reverse 9s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .atlas-mark__ring {
+      animation: none;
+    }
+  }
+</style>
