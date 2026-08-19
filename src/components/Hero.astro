@@ -7,26 +7,44 @@ import { profile } from "../data/profile";
   <canvas class="hero__canvas" data-signal-canvas aria-hidden="true"></canvas>
 
   <div class="hero__content container">
-    <p class="eyebrow">Software & AI Engineering · Rio de Janeiro</p>
-    <h1 id="hero-title">{profile.name}</h1>
-    <p class="hero__lead">{profile.headline}</p>
+    <div class="hero__copy">
+      <p class="eyebrow">Software & AI Engineering · Rio de Janeiro</p>
+      <h1 id="hero-title">{profile.name}</h1>
+      <p class="hero__lead">{profile.headline}</p>
 
-    <div class="hero__actions" aria-label="Primary actions">
-      <a class="button button--primary" href="#projects">
-        <span>View work</span>
-        <ArrowDown size={18} strokeWidth={1.8} />
-      </a>
-      <a class="button" href={profile.links.linkedin} target="_blank" rel="noreferrer">
-        <Linkedin size={18} strokeWidth={1.8} />
-        <span>LinkedIn</span>
-      </a>
-      <a class="button button--icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub profile">
-        <Github size={18} strokeWidth={1.8} />
-      </a>
-      <a class="button button--icon" href={profile.links.lattes} target="_blank" rel="noreferrer" aria-label="Lattes CV">
-        <FileText size={18} strokeWidth={1.8} />
-      </a>
+      <div class="hero__actions" aria-label="Primary actions">
+        <a class="button button--primary" href="#projects">
+          <span>View work</span>
+          <ArrowDown size={18} strokeWidth={1.8} />
+        </a>
+        <a class="button" href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">
+          <Linkedin size={18} strokeWidth={1.8} />
+          <span>LinkedIn</span>
+        </a>
+        <a class="button button--icon" href={profile.links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+          <Github size={18} strokeWidth={1.8} />
+        </a>
+        <a class="button button--icon" href={profile.links.lattes} target="_blank" rel="noopener noreferrer" aria-label="Lattes CV">
+          <FileText size={18} strokeWidth={1.8} />
+        </a>
+      </div>
     </div>
+
+    <figure class="hero__visual">
+      <img
+        src={profile.avatarUrl}
+        alt={`Portrait of ${profile.name}`}
+        width="260"
+        height="260"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+      <figcaption>
+        <span>{profile.role}</span>
+        <strong>{profile.location}</strong>
+      </figcaption>
+    </figure>
 
     <div class="hero__proof" aria-label="Professional proof points">
       {profile.proofPoints.map((point) => <span>{point}</span>)}
@@ -60,7 +78,7 @@ import { profile } from "../data/profile";
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       context.clearRect(0, 0, width, height);
-      context.fillStyle = "#181611";
+      context.fillStyle = "#111716";
       context.fillRect(0, 0, width, height);
 
       const t = time * 0.00035;
@@ -96,7 +114,7 @@ import { profile } from "../data/profile";
         context.fillRect(point.x - 1.5, point.y - 1.5, 3, 3);
       });
 
-      context.fillStyle = "rgba(24, 22, 17, 0.46)";
+      context.fillStyle = "rgba(17, 23, 22, 0.5)";
       context.fillRect(0, 0, width, height);
       requestAnimationFrame(draw);
     };

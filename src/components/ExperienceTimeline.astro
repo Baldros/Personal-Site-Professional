@@ -3,8 +3,8 @@ import { experiences } from "../data/experience";
 ---
 
 <div class="timeline">
-  {experiences.map((item) => (
-    <article class="timeline__item">
+  {experiences.map((item, index) => (
+    <article class="timeline__item" data-reveal data-reveal-delay={index * 45}>
       <div class="timeline__meta">
         <span>{item.period}</span>
         <span>{item.location}</span>

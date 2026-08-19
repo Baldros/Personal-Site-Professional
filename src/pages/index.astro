@@ -1,28 +1,29 @@
 ---
 import ApiStrategy from "../components/ApiStrategy.astro";
 import ArchitectureStrip from "../components/ArchitectureStrip.astro";
+import CapabilityMap from "../components/CapabilityMap.astro";
 import ContactBand from "../components/ContactBand.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
-import ExpertiseGrid from "../components/ExpertiseGrid.astro";
 import Hero from "../components/Hero.astro";
 import Layout from "../components/Layout.astro";
 import ProjectShowcase from "../components/ProjectShowcase.astro";
 import SectionHeading from "../components/SectionHeading.astro";
+import ValueFlow from "../components/ValueFlow.astro";
 import { profile } from "../data/profile";
 ---
 
 <Layout>
   <Hero />
 
-  <main>
-    <section class="section section--paper" id="expertise">
+  <main id="main">
+    <section class="section section--paper section--capabilities" id="expertise">
       <div class="container">
         <SectionHeading
-          eyebrow="Positioning"
-          title="Applied AI engineer with scientific depth and product instincts."
-          body={profile.summary}
+          eyebrow="Capabilities and offers"
+          title="Applied AI, automation, and scientific computing in one operating range."
+          body="A portfolio layout should make the technical range legible fast: what can be built, where the evidence comes from, and how the work maps to real systems."
         />
-        <div class="metric-row" aria-label="Profile metrics">
+        <div class="metric-row" aria-label="Profile metrics" data-reveal>
           {profile.metrics.map((metric) => (
             <div class="metric">
               <strong>{metric.value}</strong>
@@ -30,11 +31,22 @@ import { profile } from "../data/profile";
             </div>
           ))}
         </div>
-        <ExpertiseGrid />
+        <CapabilityMap />
       </div>
     </section>
 
-    <section class="section" id="experience">
+    <section class="section section--value" id="value">
+      <div class="container">
+        <SectionHeading
+          eyebrow="Value proposition"
+          title="From raw context to useful engineering decisions."
+          body="The work is strongest when it connects model reasoning to a concrete operating surface: retrieval, automation, dashboards, internal tools, and domain-specific assistants."
+        />
+        <ValueFlow />
+      </div>
+    </section>
+
+    <section class="section section--story" id="experience">
       <div class="container">
         <SectionHeading
           eyebrow="Experience"
@@ -45,7 +57,7 @@ import { profile } from "../data/profile";
       </div>
     </section>
 
-    <section class="section section--warm" id="projects">
+    <section class="section section--warm section--projects" id="projects">
       <div class="container">
         <SectionHeading
           eyebrow="Selected Work"
@@ -56,12 +68,12 @@ import { profile } from "../data/profile";
       </div>
     </section>
 
-    <section class="section" id="architecture">
+    <section class="section section--workflow" id="architecture">
       <div class="container">
         <SectionHeading
-          eyebrow="Architecture"
-          title="Prepared for official APIs and richer agent interaction."
-          body="The current build is not a static resume dressed as an app. It separates content, UI, API capability registry, and the Atlas interaction layer so each part can evolve independently."
+          eyebrow="Methods and workflows"
+          title="A portfolio architecture ready for richer agent interaction."
+          body="Like the reference layout, this section turns architecture into a visible system: content, interface, official API layer, and evidence registry."
         />
         <ArchitectureStrip />
       </div>

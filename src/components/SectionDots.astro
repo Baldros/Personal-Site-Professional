@@ -1,0 +1,48 @@
+---
+const items = [
+  { label: "Home", href: "#top", target: "top" },
+  { label: "Capabilities", href: "#expertise", target: "expertise" },
+  { label: "Value", href: "#value", target: "value" },
+  { label: "Experience", href: "#experience", target: "experience" },
+  { label: "Projects", href: "#projects", target: "projects" },
+  { label: "Architecture", href: "#architecture", target: "architecture" },
+  { label: "APIs", href: "#apis", target: "apis" },
+  { label: "Contact", href: "#contact", target: "contact" }
+];
+---
+
+<nav class="section-dots" aria-label="Page section navigation">
+  {items.map((item) => (
+    <div class="section-dots__item">
+      <span>{item.label}</span>
+      <a class="section-dots__dot" href={item.href} aria-label={item.label} data-section-dot={item.target}></a>
+    </div>
+  ))}
+</nav>
+
+<script>
+  const dots = Array.from(document.querySelectorAll("[data-section-dot]")) as HTMLAnchorElement[];
+  const sections = dots
+    .map((dot) => {
+      const id = dot.dataset.sectionDot;
+      return id ? { dot, section: document.getElementById(id) } : null;
+    })
+    .filter((item): item is { dot: HTMLAnchorElement; section: HTMLElement } => Boolean(item?.section));
+
+  if (sections.length && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          dots.forEach((dot) => dot.classList.remove("is-active"));
+          const active = dots.find((dot) => dot.dataset.sectionDot === entry.target.id);
+          active?.classList.add("is-active");
+        });
+      },
+      { rootMargin: "-38% 0px -52% 0px", threshold: 0.01 }
+    );
+
+    sections.forEach(({ section }) => observer.observe(section));
+  }
+</script>

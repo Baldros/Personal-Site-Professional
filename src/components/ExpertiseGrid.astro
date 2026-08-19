@@ -1,15 +1,30 @@
 ---
+import { BarChart3, BrainCircuit, Network, Satellite } from "lucide-astro";
 import { expertise } from "../data/profile";
+
+const iconMap = {
+  mineral: BrainCircuit,
+  moss: Network,
+  gold: BarChart3,
+  clay: Satellite
+};
 ---
 
 <div class="expertise-grid">
-  {expertise.map((item) => (
-    <article class={`expertise-card expertise-card--${item.accent}`}>
-      <h3>{item.title}</h3>
-      <p>{item.body}</p>
-      <ul>
-        {item.items.map((skill) => <li>{skill}</li>)}
-      </ul>
-    </article>
-  ))}
+  {
+    expertise.map((item) => {
+      const Icon = iconMap[item.accent];
+
+      return (
+        <article class={`expertise-card expertise-card--${item.accent}`}>
+          <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+          <ul>
+            {item.items.map((skill) => <li>{skill}</li>)}
+          </ul>
+        </article>
+      );
+    })
+  }
 </div>

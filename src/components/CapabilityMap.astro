@@ -1,0 +1,102 @@
+---
+import {
+  BarChart3,
+  BrainCircuit,
+  Database,
+  Layers,
+  Satellite,
+  Search,
+  Share2,
+  Terminal
+} from "lucide-astro";
+
+const methodTags = [
+  "LLM agents",
+  "RAG",
+  "MCP",
+  "Automation",
+  "Power BI",
+  "Scientific computing",
+  "Remote sensing",
+  "Official APIs",
+  "Decision support",
+  "Internal tooling",
+  "Python",
+  "TypeScript"
+];
+
+const capabilities = [
+  {
+    title: "Agentic AI systems",
+    icon: BrainCircuit,
+    body: "Assistants that connect language models to tools, workflows, files, and verified context.",
+    tags: ["Agents", "LangGraph", "MCP"]
+  },
+  {
+    title: "Retrieval and search",
+    icon: Search,
+    body: "Knowledge systems that turn documentation, repositories, and operational context into usable answers.",
+    tags: ["RAG", "Enterprise search", "Docs"]
+  },
+  {
+    title: "Workflow automation",
+    icon: Layers,
+    body: "Practical automation across CRM, reporting, internal operations, and repetitive business processes.",
+    tags: ["Power Platform", "Python", "Ops"]
+  },
+  {
+    title: "Data products",
+    icon: BarChart3,
+    body: "Models, dashboards, and decision layers built around business questions rather than isolated charts.",
+    tags: ["BI", "ML", "Statistics"]
+  },
+  {
+    title: "Scientific computing",
+    icon: Database,
+    body: "Numerical and engineering workflows shaped by simulation, environmental data, and research habits.",
+    tags: ["CFD context", "Models", "Analysis"]
+  },
+  {
+    title: "Remote sensing",
+    icon: Satellite,
+    body: "Satellite and atmospheric data workflows for environmental intelligence and spatial analysis.",
+    tags: ["Earth Engine", "R", "Geospatial"]
+  },
+  {
+    title: "Local tool bridges",
+    icon: Terminal,
+    body: "CLI utilities that let assistants operate real local and cloud workflows through explicit tools.",
+    tags: ["CLI", "Google APIs", "YouTube"]
+  },
+  {
+    title: "Social API layer",
+    icon: Share2,
+    body: "Official LinkedIn, TikTok, and X integrations behind explicit OAuth, scope, and spend boundaries.",
+    tags: ["OAuth", "LinkedIn", "Governance"]
+  }
+];
+---
+
+<div class="method-tag-rail" aria-label="Methods and technologies">
+  {methodTags.map((tag) => <span>{tag}</span>)}
+</div>
+
+<div class="capability-grid">
+  {
+    capabilities.map((capability, index) => {
+      const Icon = capability.icon;
+
+      return (
+        <article class="capability-card" data-reveal data-reveal-delay={index * 35}>
+          <span class="capability-card__index">{String(index + 1).padStart(2, "0")}</span>
+          <Icon size={24} strokeWidth={1.7} aria-hidden="true" />
+          <h3>{capability.title}</h3>
+          <p>{capability.body}</p>
+          <div class="tag-list">
+            {capability.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+        </article>
+      );
+    })
+  }
+</div>

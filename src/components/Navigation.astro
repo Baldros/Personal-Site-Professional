@@ -3,10 +3,11 @@ import { Github, Linkedin, Mail } from "lucide-astro";
 import { profile } from "../data/profile";
 
 const navItems = [
-  { label: "Expertise", href: "#expertise" },
+  { label: "Capabilities", href: "#expertise" },
+  { label: "Value", href: "#value" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
-  { label: "Architecture", href: "#architecture" }
+  { label: "APIs", href: "#apis" }
 ];
 ---
 
@@ -22,10 +23,10 @@ const navItems = [
     </div>
 
     <div class="nav__actions" aria-label="External links">
-      <a href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub profile">
+      <a href={profile.links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
         <Github size={18} strokeWidth={1.8} />
       </a>
-      <a href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
+      <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
         <Linkedin size={18} strokeWidth={1.8} />
       </a>
       <a href={profile.links.email} aria-label="Email André">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageSquare, Send, Sparkles, X } from "lucide-react";
 import { answerAtlasPrompt } from "../lib/agent/answers";
 
@@ -18,24 +18,31 @@ const starterPrompts = [
   "Which projects show agent engineering?"
 ];
 
+function parseEventBlock(block: string): AgentEvent | null {
+  const dataLine = block.split("\n").find((line) => line.startsWith("data: "));
+
+  if (!dataLine) return null;
+
+  try {
+    return JSON.parse(dataLine.replace("data: ", "")) as AgentEvent;
+  } catch {
+    return { type: "PARSE_ERROR" };
+  }
+}
+
 function parseSse(text: string): AgentEvent[] {
   return text
     .split("\n\n")
-    .map((block) => block.split("\n").find((line) => line.startsWith("data: ")))
-    .filter(Boolean)
-    .map((line) => {
-      try {
-        return JSON.parse(line!.replace("data: ", "")) as AgentEvent;
-      } catch {
-        return { type: "PARSE_ERROR" };
-      }
-    });
+    .map(parseEventBlock)
+    .filter((event): event is AgentEvent => Boolean(event));
 }
 
 export default function AtlasDock() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const messagesEndRef = useRef<HTMLSpanElement | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "atlas",
@@ -45,6 +52,96 @@ export default function AtlasDock() {
   ]);
 
   const canSend = useMemo(() => input.trim().length > 1 && !loading, [input, loading]);
+
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: "end" });
+  }, [messages, open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  function updateLastAtlasMessage(updater: string | ((content: string) => string)) {
+    setMessages((current) => {
+      const next = [...current];
+      const last = next[next.length - 1];
+
+      if (!last || last.role !== "atlas") {
+        return current;
+      }
+
+      next[next.length - 1] = {
+        ...last,
+        content: typeof updater === "function" ? updater(last.content) : updater
+      };
+
+      return next;
+    });
+  }
+
+  async function readAgentResponse(response: Response, prompt: string) {
+    if (!response.body) {
+      const text = await response.text();
+      const content = parseSse(text)
+        .filter((event) => event.type === "TEXT_MESSAGE_CONTENT")
+        .map((event) => event.delta ?? "")
+        .join("");
+
+      updateLastAtlasMessage(content || answerAtlasPrompt(prompt));
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let received = "";
+
+    const applyBlock = (block: string) => {
+      const event = parseEventBlock(block);
+
+      if (event?.type !== "TEXT_MESSAGE_CONTENT") return;
+
+      const delta = event.delta ?? "";
+      received += delta;
+      updateLastAtlasMessage((current) => `${current}${delta}`);
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const blocks = buffer.split("\n\n");
+      buffer = blocks.pop() ?? "";
+      blocks.forEach(applyBlock);
+    }
+
+    buffer += decoder.decode();
+
+    if (buffer.trim()) {
+      applyBlock(buffer);
+    }
+
+    if (!received) {
+      updateLastAtlasMessage(answerAtlasPrompt(prompt));
+    }
+  }
 
   async function sendMessage(value = input) {
     const prompt = value.trim();
@@ -63,23 +160,9 @@ export default function AtlasDock() {
 
       if (!response.ok) throw new Error("Atlas endpoint failed");
 
-      const text = await response.text();
-      const content = parseSse(text)
-        .filter((event) => event.type === "TEXT_MESSAGE_CONTENT")
-        .map((event) => event.delta ?? "")
-        .join("");
-
-      setMessages((current) => {
-        const next = [...current];
-        next[next.length - 1] = { role: "atlas", content: content || answerAtlasPrompt(prompt) };
-        return next;
-      });
+      await readAgentResponse(response, prompt);
     } catch {
-      setMessages((current) => {
-        const next = [...current];
-        next[next.length - 1] = { role: "atlas", content: answerAtlasPrompt(prompt) };
-        return next;
-      });
+      updateLastAtlasMessage(answerAtlasPrompt(prompt));
     } finally {
       setLoading(false);
     }
@@ -96,13 +179,15 @@ export default function AtlasDock() {
         className="atlas__launcher"
         type="button"
         aria-label={open ? "Close Atlas" : "Open Atlas"}
+        aria-controls="atlas-panel"
+        aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
         {open ? <X size={20} /> : <MessageSquare size={20} />}
       </button>
 
       {open && (
-        <section className="atlas__panel" aria-label="Atlas assistant preview">
+        <section className="atlas__panel" id="atlas-panel" aria-label="Atlas assistant preview">
           <header className="atlas__header">
             <div>
               <span>
@@ -116,12 +201,13 @@ export default function AtlasDock() {
             </button>
           </header>
 
-          <div className="atlas__messages">
+          <div className="atlas__messages" aria-live="polite" aria-busy={loading}>
             {messages.map((message, index) => (
               <p className={`atlas__message atlas__message--${message.role}`} key={`${message.role}-${index}`}>
                 {message.content || "Thinking..."}
               </p>
             ))}
+            <span className="atlas__message-end" ref={messagesEndRef} />
           </div>
 
           <div className="atlas__prompts">
@@ -134,6 +220,7 @@ export default function AtlasDock() {
 
           <form className="atlas__form" onSubmit={onSubmit}>
             <input
+              ref={inputRef}
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Ask Atlas"

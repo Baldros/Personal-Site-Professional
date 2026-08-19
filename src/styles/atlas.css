@@ -11,14 +11,15 @@
   width: 52px;
   height: 52px;
   place-items: center;
-  color: #fff7e7;
-  border: 1px solid rgba(255, 247, 231, 0.24);
+  color: #f8fbf8;
+  border: 1px solid rgba(248, 251, 248, 0.24);
   border-radius: 50%;
-  background: #243a33;
+  background: #103b3e;
+  box-shadow: 0 14px 36px rgba(18, 20, 23, 0.22);
 }
 
 .atlas__launcher:hover {
-  background: #1b302a;
+  background: #0b3032;
 }
 
 .atlas__panel {
@@ -33,6 +34,7 @@
   border: 1px solid var(--line-strong);
   border-radius: 8px;
   background: var(--surface);
+  box-shadow: 0 24px 70px rgba(18, 20, 23, 0.18);
 }
 
 .atlas__header {
@@ -42,7 +44,7 @@
   gap: 14px;
   padding: 16px;
   border-bottom: 1px solid var(--line);
-  background: #f2e8d8;
+  background: var(--surface-deep);
 }
 
 .atlas__header span {
@@ -94,14 +96,18 @@
 
 .atlas__message--user {
   align-self: flex-end;
-  color: #fff7e7;
-  border-color: #617b55;
-  background: #4e6c5c;
+  color: #ffffff;
+  border-color: #006a73;
+  background: var(--mineral);
 }
 
 .atlas__message--atlas {
   align-self: flex-start;
-  background: #f7f1e6;
+  background: #eef3ec;
+}
+
+.atlas__message-end {
+  min-height: 1px;
 }
 
 .atlas__prompts {
@@ -117,13 +123,13 @@
   text-align: left;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 253, 248, 0.78);
+  background: rgba(255, 255, 255, 0.78);
   font-size: 0.84rem;
 }
 
 .atlas__prompts button:hover {
   border-color: var(--line-strong);
-  background: #f2e8d8;
+  background: var(--surface-deep);
 }
 
 .atlas__form {
@@ -132,7 +138,7 @@
   gap: 8px;
   padding: 14px;
   border-top: 1px solid var(--line);
-  background: #f2e8d8;
+  background: var(--surface-deep);
 }
 
 .atlas__form input {
@@ -159,5 +165,6 @@
 
   .atlas__panel {
     bottom: 62px;
+    max-height: calc(100svh - 96px);
   }
 }

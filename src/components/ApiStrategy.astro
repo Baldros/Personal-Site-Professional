@@ -3,8 +3,8 @@ import { apiPlatforms } from "../data/api-strategy";
 ---
 
 <div class="api-grid">
-  {apiPlatforms.map((platform) => (
-    <article class="api-card">
+  {apiPlatforms.map((platform, index) => (
+    <article class="api-card" data-reveal data-reveal-delay={index * 60}>
       <p class="api-card__posture">{platform.posture}</p>
       <h3>{platform.name}</h3>
       <p>{platform.summary}</p>
